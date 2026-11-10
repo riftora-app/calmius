@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calmius</title>
+<meta name="theme-color" content="#16131f">
+<meta name="description" content="Calmius – deine Skills-App für Anspannung, Druck und einen stabilen Alltag.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#16131f;--card:#211d2f;--card2:#2b2640;--text:#f1eef8;--muted:#a59fba;--line:#383252;--green:#6fcf9f;--yellow:#f0c35a;--red:#ee8a7c;--accent:#9f8cf5;--accent2:#6fd0c9;--orange:#f2a46b;--violet:#c39cf0;--spot:#1db954;--grad:linear-gradient(135deg,#9f8cf5 0%,#6fd0c9 100%)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font:18px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{background:radial-gradient(1200px 500px at 50% -200px,rgba(159,140,245,.18),transparent 70%),var(--bg);background-attachment:fixed}
+body{min-height:100vh;padding-bottom:88px}
+main{max-width:520px;margin:0 auto;padding:calc(22px + env(safe-area-inset-top)) 18px 22px}
+h1{font-size:26px;font-weight:650;margin-bottom:6px;line-height:1.25}
+h2{font-size:21px;font-weight:620;margin:24px 0 8px}
+h3{font-size:15px;font-weight:650;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:22px 0 4px}
+p{margin:6px 0}
+.muted{color:var(--muted);font-size:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.val{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums}
+.ticks{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;margin-top:12px}
+.ticks button{height:46px;border-radius:10px;background:var(--card2);border:1px solid var(--line);font-size:17px;font-weight:600;color:var(--muted)}
+.ticks button.on{color:#111;border-color:transparent}
+.scale{display:flex;justify-content:space-between;color:var(--muted);font-size:14px;margin-top:6px}
+button{font:inherit;color:inherit;border:0;cursor:pointer;background:none}
+a{color:inherit}
+.btn{display:block;width:100%;padding:16px;border-radius:16px;background:var(--grad);color:#14112a;box-shadow:0 6px 20px rgba(111,208,201,.15);font-weight:650;font-size:19px;margin-top:12px;text-align:center;text-decoration:none}
+.btn.sec{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+.btn.red{background:var(--red);color:#1a0c0b}
+.btn.spot{background:var(--spot);color:#06180d}
+.btn:disabled{opacity:.45}
+.link{color:var(--accent);text-decoration:underline;font-size:16px;margin-top:14px;display:block;text-align:center;width:100%}
+.zone{display:inline-block;padding:4px 12px;border-radius:999px;font-size:15px;font-weight:650}
+.z-niedrig{background:rgba(95,174,138,.18);color:var(--green)}
+.z-mittel{background:rgba(212,179,90,.18);color:var(--yellow)}
+.z-hoch{background:rgba(208,112,106,.2);color:var(--red)}
+.tag{display:inline-block;font-size:13px;font-weight:650;padding:2px 9px;border-radius:999px;margin-right:6px;background:var(--card2);color:var(--muted)}
+.skill{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:10px 0}
+.skill b{display:block;font-size:19px;margin:4px 0 2px}
+.skill span.s{color:var(--muted);font-size:15px}
+.skill em{font-style:normal;font-size:13px;color:var(--green)}
+.skill .why2{display:block;font-size:13px;color:var(--accent);margin-top:4px}
+.help{border:2px solid var(--red);background:rgba(208,112,106,.1)}
+.pflege{display:flex;gap:12px;align-items:center;border:1px solid #4a3a3a;background:rgba(208,112,106,.07);border-radius:14px;padding:12px 14px;margin:18px 0 6px;font-size:16px}
+.pflege .i{font-size:24px}
+ol.steps{padding-left:22px;margin:10px 0} ol.steps li{margin:9px 0}
+.why{font-size:16px;color:var(--muted);border-left:3px solid var(--line);padding-left:10px;margin:10px 0}
+.age{font-size:14px;color:var(--green);margin-top:4px}
+.timer{font-size:52px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums;margin:8px 0}
+.breath{width:150px;height:150px;border-radius:50%;margin:14px auto;background:rgba(127,166,214,.22);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-weight:650;transition:transform 4s ease-in-out}
+textarea,input{width:100%;font:inherit;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:6px}
+textarea{min-height:88px;resize:vertical}
+label{font-weight:600;display:block;margin-top:16px}
+.err{color:var(--red);font-size:16px;margin-top:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:8px 13px;font-size:15px}
+.chip.on{background:var(--text);color:#111;border-color:var(--text)}
+.choice{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:12px 0}
+.choice b{display:block;font-size:20px} .choice span{color:var(--muted);font-size:15px}
+.eval{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.eval button{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 6px;font-size:16px;font-weight:600}
+.eval .i{display:block;font-size:30px;margin-bottom:4px}
+.bars{display:grid;grid-template-columns:120px 1fr 34px;gap:8px 10px;align-items:center;font-size:15px;margin-top:6px}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden} .bar i{display:block;height:100%}
+nav{position:fixed;left:0;right:0;bottom:0;background:rgba(18,15,28,.96);backdrop-filter:blur(8px);padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--line);display:flex;justify-content:center}
+nav div{display:flex;max-width:520px;width:100%}
+nav button{flex:1;padding:11px 2px 16px;color:var(--muted);font-size:13px;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button.on{color:var(--text)}
+nav svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}
+.overlay .card{max-width:420px;width:100%}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:10px 18px;border-radius:12px;font-size:16px;z-index:20}
+.foot{color:var(--muted);font-size:14px;text-align:center;margin-top:22px}
+.logo{font-size:44px;margin:30px 0 8px}
+ol.how{padding-left:22px} ol.how li{margin:10px 0}
+.hero{display:block;width:100%;text-align:left;border-radius:22px;padding:22px;margin:16px 0;background:linear-gradient(135deg,rgba(159,140,245,.35),rgba(111,208,201,.22));border:1px solid rgba(159,140,245,.45);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.hero b{display:block;font-size:22px} .hero span{color:var(--muted);font-size:16px}
+.areas{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.area{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 4px;text-align:center;position:relative}
+.area .i{font-size:26px;display:block} .area b{display:block;font-size:12.5px;margin-top:4px;line-height:1.2}
+.area .star{position:absolute;top:4px;right:6px;font-size:12px}
+.avatar{width:64px;height:64px;border-radius:50%;background:var(--accent);color:#0e1520;font-size:28px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.testbadge{display:inline-block;background:var(--yellow);color:#1b1608;font-size:13px;font-weight:700;padding:2px 9px;border-radius:999px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:14px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.day{font-weight:650;margin:16px 0 4px}
+.prow{border-top:1px solid var(--line);padding:10px 0;font-size:16px}
+.prow .t{color:var(--muted);font-variant-numeric:tabular-nums;margin-right:8px}
+.vals{display:flex;gap:12px;flex-wrap:wrap;margin-top:3px;font-size:15px}
+.trig{font-size:14px;color:var(--orange)}
+.peak{border-left:4px solid var(--red)}
+.seg{display:flex;background:var(--card2);border-radius:12px;padding:4px;margin:12px 0}
+.seg button{flex:1;padding:10px 4px;border-radius:9px;font-size:15px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--card);color:var(--text)}
+body.out nav{display:none}
+.brand{font-size:34px;font-weight:750;letter-spacing:-.5px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logoimg{width:84px;height:84px;border-radius:24px;margin:34px 0 14px;box-shadow:0 10px 30px rgba(159,140,245,.35)}
+.reward{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,rgba(240,195,90,.16),rgba(242,164,107,.10));border:1px solid rgba(240,195,90,.35);border-radius:18px;padding:14px 16px;margin:14px 0}
+.reward .ri{font-size:32px}
+.reward b{display:block;font-size:17px}
+.prog{height:8px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:6px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,#f0c35a,#f2a46b);border-radius:4px}
+.quote{font-size:19px;line-height:1.5;font-weight:500;margin:8px 0 4px}
+.pop{animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+.know{background:linear-gradient(135deg,rgba(111,208,201,.14),rgba(159,140,245,.10));border:1px solid rgba(111,208,201,.35)}
+.kcard{border-top:1px solid var(--line);padding:12px 0}
+.kcard:first-of-type{border-top:0}
+.kcard b{display:block;font-size:17px;margin-bottom:3px}
+.kcard p{font-size:16px;color:#d6d1e6}
+.back{display:inline-flex;align-items:center;gap:4px;color:var(--accent);font-size:17px;font-weight:600;padding:4px 0 10px;margin-top:-6px}
+.focus{border:2px solid var(--accent)}
+.item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.item .ii{font-size:28px;line-height:1}
+.item .it b{display:block;font-size:16.5px} .item .it small{display:block;color:var(--muted);font-size:14px}
+.item .il{display:flex;flex-wrap:wrap;gap:14px;margin-top:6px} .item .il a{color:var(--accent);font-size:15px;font-weight:600;text-decoration:none}
+.shop{border:1px solid #3a4a62;background:rgba(127,166,214,.06)}
+.acc{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:8px 0}
+.acc .i{font-size:26px} .acc b{display:block;font-size:17px} .acc small{color:var(--muted);font-size:13px}
+.acc .chev{margin-left:auto;color:var(--muted);font-size:22px;transition:transform .2s} .acc.open .chev{transform:rotate(90deg)}
+.acc2{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 4px;border-top:1px solid var(--line);font-size:16px;font-weight:600}
+.acc2 .chev{margin-left:auto;color:var(--muted);transition:transform .2s} .acc2.open .chev{transform:rotate(90deg)}
+.accbody{padding:0 0 4px 12px;border-left:2px solid var(--line);margin:0 0 10px 18px}
+.skill.mini{padding:11px 14px;margin:6px 0} .skill.mini b{font-size:16.5px;margin:0}
+.nfs{border:1px solid #3d5a49;background:rgba(95,174,138,.07)}
+.rng{display:flex;gap:6px;margin:12px 0}
+.rng button{flex:1;padding:10px 2px;border-radius:10px;background:var(--card2);border:1px solid var(--line);font-size:14px;font-weight:650;color:var(--muted)}
+.rng button.on{background:var(--text);color:#111;border-color:var(--text)}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 10px 9px}
+.kpi span{display:block;font-size:12.5px;color:var(--muted);line-height:1.25;min-height:31px}
+.kpi b{display:block;font-size:25px;font-variant-numeric:tabular-nums;margin-top:2px}
+.kpi small{display:block;font-size:12px;color:var(--muted);margin-top:1px}
+.sec-t{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:22px 0 6px;display:flex;justify-content:space-between}
+.phead{border-bottom:1px solid var(--line);padding-bottom:10px}
+.drow{display:grid;grid-template-columns:1.6fr repeat(3,.9fr) 16px;gap:4px;align-items:center;padding:11px 6px;border-top:1px solid var(--line);width:100%;text-align:left}
+.drow.hd{font-size:12px;color:var(--muted);border-top:0;padding-top:4px;padding-bottom:6px}
+.drow .lb b{display:block;font-size:15.5px} .drow .lb small{font-size:12.5px;color:var(--muted)}
+.drow .n{text-align:center;font-weight:700;font-variant-numeric:tabular-nums;font-size:16px}
+.drow .chev{color:var(--muted);transition:transform .2s} .drow.open .chev{transform:rotate(90deg)}
+.dbody{background:var(--card2);border-radius:10px;padding:2px 10px;margin:2px 0 8px}
+.dbody .drow{padding:9px 2px}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav><div>
+  <button data-v="start"><svg viewBox="0 0 24 24"><path d="M4 11l8-6 8 6v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>Start</button>
+  <button data-v="skills"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="2"/><path d="M9 7V5h6v2"/></svg>Skills</button>
+  <button data-v="fuermich"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg>Für mich</button>
+  <button data-v="plan"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>Notfallplan</button>
+  <button data-v="profil"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>Profil</button>
+</div></nav>
+
+<script>
+/* ===== Speicher: ausschließlich lokal auf diesem Gerät ===== */
+const KEY="calmius-v1"; let mem=null;
+function fresh(){ return {account:null,loggedIn:false,onboarded:false,spotify:"",points:[],plan:{warn:"",skills:"",people:"",reasons:""}}; }
+function load(){ try{ const r=localStorage.getItem(KEY); if(r) return Object.assign(fresh(),JSON.parse(r)); }catch(e){} return mem||fresh(); }
+function save(){ mem=S; try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+let S=load();
+async function hash(pw,salt){ const txt=salt+":"+pw;
+  try{ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(txt)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+  catch(e){ let h=5381; for(const c of txt) h=((h<<5)+h+c.charCodeAt(0))|0; return "f"+(h>>>0).toString(16); } }
+
+/* ===== Kategorien, Stufen, Wege, Auslöser ===== */
+const AREAS={
+  s:{label:"Körper & Sport",icon:"🏃",why:"Bewegung baut Stresshormone ab und holt dich zurück in den Körper."},
+  k:{label:"Kreativ",icon:"🎨",why:"Kreatives Tun gibt Gefühlen eine Form und bindet die Aufmerksamkeit."},
+  m:{label:"Achtsamkeit & Atmung",icon:"🧘",why:"Ruhiges Atmen und Achtsamkeit senken die Erregung und schaffen Abstand."},
+  b:{label:"Sinne & Beruhigung",icon:"🕯️",why:"Angenehme Sinneseindrücke beruhigen das Nervensystem."},
+  c:{label:"Kontakt & Miteinander",icon:"🤝",why:"Verbindung zu anderen Menschen gibt Halt und nimmt Druck."},
+  n:{label:"Natur & Draußen",icon:"🌳",why:"Natur, Licht und frische Luft beruhigen und verändern den Blick."},
+  d:{label:"Kopf & Ablenkung",icon:"🧩",why:"Wenn der Kopf beschäftigt ist, bleibt weniger Raum für Druck und Grübeln."},
+  a:{label:"Alltag & Struktur",icon:"📅",why:"Struktur und kleine erledigte Aufgaben geben Sicherheit und Kontrolle."}
+};
+const TIERS={hoch:{label:"Hochspannung",range:"7–10",cls:"z-hoch"},mittel:{label:"Mittlere Spannung",range:"4–6",cls:"z-mittel"},niedrig:{label:"Niedrige Spannung",range:"0–3",cls:"z-niedrig"}};
+const MODES={a:{label:"Anspannung",n:1,lo:"ruhig",hi:"unerträglich",d:"Wenn Spannung und Unruhe steigen",c:"var(--accent)"},
+             sv:{label:"Selbstverletzungsdruck",n:2,lo:"kein Druck",hi:"sehr stark",d:"Wenn der Drang da ist, dich zu verletzen",c:"var(--orange)"},
+             sui:{label:"Suizidgedanken",n:3,lo:"keine",hi:"sehr stark",d:"Wenn Gedanken ans Sterben da sind",c:"var(--violet)"}};
+const TRIGGERS={
+  streit:{l:"Streit und Konflikte",c:["s","m"]}, allein:{l:"Alleinsein",c:["c","b"]}, abend:{l:"Abends und nachts",c:["b","m"]},
+  kritik:{l:"Kritik und Ablehnung",c:["m","k"]}, erinnerung:{l:"Belastende Erinnerungen",c:["d","b"]}, leere:{l:"Langeweile und Leere",c:["k","a"]},
+  laerm:{l:"Lärm und viele Menschen",c:["n","b"]}, schlaf:{l:"Schlafmangel",c:["b","a"]}, druck:{l:"Überforderung",c:["a","m"]},
+  besuch:{l:"Besuch oder Telefonate",c:["m","s"]}, gruebeln:{l:"Grübeln",c:["d","s"]}, koerper:{l:"Körperliche Beschwerden",c:["b","m"]}
+};
+const SENIOR=60;
+
+/* ===== 400 Skills: 8 Kategorien × 50, DBT-orientiert, ohne Schmerz-, Kälte- oder Schockreize =====
+   Format: Stufe|Titel|Untertitel|Minuten|Schritt;Schritt  ·  ! = intensiv (ab 60 nicht vorgeschlagen), ♪ = Spotify, ~ = Atemkreis, @ = öffnet Notfallplan */
+const RAW="#s\nh|!Intensive Bewegung|Körper auspowern|2|Steh auf.;Mach Kniebeugen, Hampelmänner oder geh zügig Treppen.;So schnell, wie es für dich gut geht – bis der Timer endet.\nh|Muskeln anspannen und lösen|Spannung aus dem Körper holen|3|Fäuste 5 Sekunden fest ballen, dann loslassen.;Schultern hochziehen, 5 Sekunden halten, loslassen.;Beine anspannen, 5 Sekunden halten, loslassen.\nh|Ball fest drücken|Knautschball, Kissen, Handtuch|2|Nimm einen Knautschball oder ein Kissen.;Drück 10 Sekunden mit aller Kraft.;Lass los, atme aus und wiederhole.\nh|!Treppen steigen|Zügig rauf und runter|3|Geh zum Treppenhaus, wenn es erlaubt ist.;Steig zügig ein paar Stockwerke.;Halt dich am Geländer fest.\nh|!Hampelmänner|Den Puls hochbringen|2|Mach Hampelmänner in deinem Tempo.;Zähl laut mit.;Mach Pause, wenn du außer Atem bist.\nh|!Schattenboxen|Kraft in die Luft geben|2|Stell dich mit Abstand zu allem hin.;Box mit lockeren Fäusten in die Luft.;Atme bei jedem Schlag aus.\nh|Wand drücken|Mit aller Kraft gegen die Wand|2|Stell dich vor eine Wand.;Drück mit beiden Händen 10 Sekunden so fest du kannst.;Loslassen, ausatmen, wiederholen.\nh|Handtuch auswringen|Kraft in die Hände|2|Nimm ein trockenes Handtuch.;Wring es mit aller Kraft aus.;Wechsel die Richtung und wiederhole.\nh|!Auf der Stelle laufen|Schnell und kräftig|2|Lauf auf der Stelle.;Zieh die Knie hoch.;Weiter, bis der Timer endet.\nh|Arme kreisen|Große, kräftige Kreise|2|Streck die Arme seitlich aus.;Kreise sie kräftig vorwärts, dann rückwärts.;Mach die Kreise immer größer.\nh|Stuhl-Stemmen|Im Sitzen hochdrücken|2|Setz dich auf einen stabilen Stuhl mit Armlehnen.;Drück dich mit den Armen kurz hoch.;Langsam absetzen, 10-mal.\nh|Fäuste ballen und öffnen|Schnell im Wechsel|1|Ball die Fäuste fest.;Öffne die Hände weit.;30-mal im schnellen Wechsel.\nh|!Wandsitzen|Wie auf einem unsichtbaren Stuhl|2|Lehn den Rücken an die Wand.;Rutsch in eine leichte Hocke.;Halte, solange es gut geht.\nh|Stampfen|Fest auf den Boden|1|Stell dich hin.;Stampf abwechselnd fest mit den Füßen auf.;Spür den Boden unter dir.\nh|Ausschütteln|Den ganzen Körper|2|Schüttel erst die Hände aus, dann die Arme.;Dann die Beine und den ganzen Körper.;Wie ein nasser Hund.\nm|Runde über den Flur|Gehen und zählen|5|Geh ruhig über den Stationsflur.;Zähl deine Schritte bis 100, dann von vorn.\nm|♪Zu einem Lied tanzen|Bewegung mit Musik|4|Wähle ein Lied, das dich mitnimmt.;Beweg dich, wie es sich gut anfühlt.;Ein Lied lang.\nm|Dehnen|Den Körper langsam lösen|5|Streck die Arme 20 Sekunden nach oben.;Beug dich nach vorn und lass die Arme hängen.;Kreise langsam die Schultern.\nm|Dehnen im Sitzen|Sanft auf dem Stuhl|5|Setz dich aufrecht hin.;Streck die Arme 20 Sekunden nach oben.;Neig den Kopf langsam zu jeder Seite.\nm|Schulterkreisen|Verspannungen lösen|2|Zieh die Schultern hoch.;Kreise sie langsam nach hinten.;10-mal, dann nach vorn.\nm|Nacken lockern|Den Kopf sanft bewegen|3|Neig den Kopf langsam nach rechts, dann nach links.;Schau über die Schultern.;Langsam und ohne Druck.\nm|♪Im Sitzen zur Musik bewegen|Arme, Schultern, Füße im Takt|4|Setz dich bequem hin und mach ein Lied an.;Wipp mit den Füßen.;Beweg Arme und Schultern im Takt.\nm|Balance halten|Auf einem Bein stehen|3|Halt dich an einer Stuhllehne fest.;Steh 20 Sekunden auf einem Bein.;Wechsel das Bein.\nm|Füße kreisen|Gelenke lockern|2|Setz dich hin.;Kreise jeden Fuß 10-mal in beide Richtungen.\nm|Katzenbuckel|Den Rücken bewegen|3|Setz dich aufrecht hin oder geh in den Vierfüßlerstand.;Mach den Rücken rund, dann gerade.;Im Rhythmus deines Atems.\nm|Ball werfen|Gegen die Wand oder mit jemandem|5|Nimm einen weichen Ball.;Wirf ihn gegen die Wand und fang ihn.;Zähl, wie oft es klappt.\nm|Oberkörper drehen|Die Wirbelsäule bewegen|2|Steh oder sitz aufrecht.;Dreh den Oberkörper langsam nach rechts und links.;10-mal pro Seite.\nm|Zehenspitzengang|Langsam auf den Zehen|2|Geh langsam auf Zehenspitzen.;Dann auf den Fersen.;Abwechselnd, 2 Minuten lang.\nm|Arme schwingen|Locker vor und zurück|2|Steh locker.;Lass die Arme vor und zurück schwingen.;Ganz entspannt.\nm|Ergometer|Gleichmäßig treten|10|Frag nach dem Ergometer oder dem Sportraum.;Tritt 10 Minuten in ruhigem Tempo.\nm|Hüften kreisen|Wie mit einem Hula-Hoop|2|Stell dich hüftbreit hin.;Kreise die Hüften.;In beide Richtungen.\nm|Liegestütz an der Wand|Sanfte Kraftübung|3|Stell dich eine Armlänge vor die Wand.;Beug und streck die Arme, 10-mal.;Pause, dann wiederholen.\nm|Sanftes Yoga|Drei einfache Haltungen|8|Steh aufrecht, 5 ruhige Atemzüge.;Baumhaltung mit Halt an der Wand.;Kindhaltung auf der Matte.\nn|!Morgengymnastik|Wach werden mit Bewegung|10|10 Hampelmänner.;10 Kniebeugen.;Arme und Hüfte kreisen.\nn|Gymnastik im Sitzen|Sanfter Start in den Tag|8|Heb die Füße abwechselnd an, je 10-mal.;Streck die Arme nach vorn und oben.;Kreise die Schultern.\nn|Sportgruppe besuchen|Angebote der Station nutzen|30|Schau im Wochenplan nach Sport- oder Bewegungsgruppen.;Geh einfach hin.\nn|Tischtennis|Eine Runde mit jemandem|15|Frag jemanden, ob er mitspielt.;Spielt locker – Gewinnen ist egal.\nn|Federball|Draußen, wenn es erlaubt ist|15|Frag nach Schlägern.;Spielt locker hin und her.\nn|Wasserflaschen-Training|Leichte Gewichte|5|Nimm zwei volle Wasserflaschen.;Heb sie seitlich bis Schulterhöhe, 10-mal.;Beug die Arme, 10-mal.\nn|Spaziergang mit Ziel|Ein kleines Ziel ansteuern|15|Such dir ein Ziel: Cafeteria, Kiosk, Bank im Park.;Geh in ruhigem Tempo hin und zurück.\nn|Schrittziel setzen|Heute ein paar Schritte mehr|5|Schau auf deinen Schrittzähler.;Setz dir ein kleines Ziel für heute.;Plane, wann du gehst.\nn|Ganzkörper-Strecken|Wie nach dem Aufwachen|2|Streck dich lang wie eine Katze.;Gähn ruhig dabei.;3-mal wiederholen.\nn|Rückenübung im Liegen|Knie zur Brust|5|Leg dich auf den Rücken.;Zieh die Knie sanft zur Brust.;Wiege dich leicht hin und her.\nn|Boccia oder Kegeln|Ruhiges Spiel|15|Frag nach einem Boccia- oder Kegelset.;Spielt eine Runde.\nn|Bewegungspause|Jede Stunde kurz aufstehen|2|Steh auf und geh ein paar Schritte.;Streck dich einmal.;Setz dich wieder.\nn|Haltung prüfen|Aufrecht sitzen|1|Stell die Füße auf den Boden.;Mach die Wirbelsäule lang.;Lass die Schultern locker sinken.\nn|Fließende Bewegung|Langsam wie beim Tai-Chi|5|Heb die Arme langsam vor dem Körper.;Senk sie beim Ausatmen.;Ganz langsam, 10-mal.\nn|Füße wippen|Von der Ferse auf die Zehen|2|Setz dich hin.;Wipp von den Fersen auf die Zehen.;20-mal.\nn|Gemeinsam walken|Zu zweit zügig gehen|20|Verabrede dich mit jemandem.;Geht zügig eine Runde.\nn|Bewegungsplan schreiben|Was will ich diese Woche bewegen?|5|Schreib drei Bewegungen auf, die dir guttun.;Trag ein, wann du sie machst.\n#k\nh|♪Rhythmus trommeln|Kräftig im Takt eines Liedes|3|Mach ein Lied mit starkem Beat an.;Trommle mit beiden Händen auf ein Kissen oder den Tisch.;Bleib im Takt, bis das Lied endet.\nh|Kräftig kritzeln|Druck aufs Papier bringen|2|Nimm einen dicken Stift und ein großes Blatt.;Kritzle mit viel Druck.;Zerknüll das Blatt danach, wenn du magst.\nh|Papier zerreißen|In kleine Schnipsel|2|Nimm altes Papier oder eine Zeitung.;Reiß es in möglichst kleine Schnipsel.;Sammle sie danach ein.\nh|Anspannung malen|Wie sieht sie aus?|5|Nimm Farben oder Stifte.;Mal die Anspannung als Farbe und Form.;Es muss nicht schön sein.\nh|♪Laut mitsingen|Ein Lied, das du auswendig kannst|4|Öffne deine Mitsing-Playlist.;Kopfhörer rein und mitsingen – laut oder leise.;Danach Handy weglegen.\nh|Knete kneten|Kraft in die Hände|3|Nimm Knete oder Ton.;Knete kräftig, drück und roll.;Form am Ende etwas Kleines.\nh|Wut-Brief schreiben|Ohne ihn abzuschicken|5|Schreib alles auf, was dich wütend macht.;Ohne Rücksicht auf Worte.;Zerreiß den Brief danach.\nh|Großformat malen|Mit großen Bewegungen|5|Nimm ein großes Blatt.;Mal mit großen, schwungvollen Bewegungen.;Benutz den ganzen Arm.\nh|Laut summen|Einen Ton halten|2|Atme tief ein.;Summ einen Ton, so lange es geht.;Spür die Vibration im Brustkorb.\nh|Buchstaben füllen|Muster in einen Buchstaben|3|Schreib einen großen Buchstaben.;Füll ihn mit Punkten, Strichen und Kreisen.\nh|Fingermalen|Mit den Händen malen|5|Nimm Fingerfarben.;Mal mit den Fingern direkt aufs Papier.;Spür die Farbe an den Händen.\nh|Reim schreiben|Den Druck in Worte bringen|5|Schreib vier Zeilen, die sich reimen.;Über das, was gerade los ist.;Sprich sie laut.\nh|Origami falten|Genau Schritt für Schritt|5|Nimm ein quadratisches Papier.;Falte ein einfaches Boot oder einen Becher.;Konzentrier dich auf jede Kante.\nh|♪Instrument spielen|Was immer da ist|5|Nimm ein Instrument: Trommel, Rassel, Gitarre.;Spiel einfach drauflos.\nh|Reißbild|Ausreißen und kleben|10|Reiß Bilder aus Zeitschriften.;Kleb sie zu einem Bild zusammen.\nm|Etwas mit den Händen|Malen, kneten, ausmalen|10|Nimm Stift, Knete oder ein Mandala.;Konzentrier dich nur auf die Bewegung deiner Hände.\nm|Gefühle aufschreiben|Alles raus aufs Papier|5|Schreib 5 Minuten alles auf, was in dir los ist.;Ohne Rechtschreibung, ohne Ordnung.\nm|Mandala ausmalen|Von außen nach innen|10|Nimm ein Mandala.;Mal es von außen nach innen aus.\nm|Muster zeichnen|Zentangle|10|Zeichne ein Quadrat.;Füll es mit wiederholten Mustern.\nm|Collage|Bilder zu einem Thema|15|Wähle ein Thema: Ruhe, Kraft, Sommer.;Sammle passende Bilder und kleb sie auf.\nm|Elfchen schreiben|Ein Gedicht aus 11 Wörtern|5|Zeile 1: ein Wort, Zeile 2: zwei, Zeile 3: drei, Zeile 4: vier, Zeile 5: eins.;Über dein Gefühl oder etwas Schönes.\nm|Comic zeichnen|Strichmännchen reichen|10|Zeichne drei Kästchen.;Erzähl darin eine kleine Geschichte.\nm|Details fotografieren|Licht, Schatten, Farben|5|Fotografiere 5 Details im Raum.;Such dein Lieblingsbild aus.\nm|Armband knüpfen|Perlen oder Fäden|15|Nimm Perlen oder Garn.;Fädle oder knüpfe ein Armband.\nm|Stricken oder Häkeln|Masche für Masche|15|Nimm Wolle und Nadeln.;Strick oder häkle ein paar Reihen.\nm|♪Liedtext umschreiben|Eigene Worte zur Melodie|10|Nimm ein bekanntes Lied.;Schreib eigene Zeilen zur Melodie.\nm|Lieblingsort malen|Wo fühlst du dich sicher?|10|Denk an einen Ort, an dem du dich wohlfühlst.;Mal ihn mit allen Details.\nm|Steine bemalen|Kleine Kunstwerke|15|Nimm einen glatten Stein.;Bemal ihn mit einem Muster oder einem Wort.\nm|Schönschrift|Ein Wort ganz langsam|5|Wähle ein Wort, das dir guttut.;Schreib es langsam in schöner Schrift.\nm|Postkarte gestalten|Für einen wichtigen Menschen|10|Gestalte eine Karte.;Schreib ein paar nette Zeilen dazu.\nm|Geschichte weiterschreiben|Ein Satz als Start|10|Beginn mit: „Als ich die Tür öffnete …“;Schreib einfach weiter.\nm|Sticken|Ruhige Handarbeit|15|Nimm Stoff und Garn.;Stick ein einfaches Muster.\nm|Malen nach Zahlen|Fläche für Fläche|15|Nimm eine Vorlage.;Mal Fläche für Fläche aus.\nn|♪Gute-Laune-Playlist bauen|Für schwere Momente vorsorgen|10|Öffne Spotify.;Sammle 10 Lieder, die dich stärken.;Hinterlege die Playlist in deinem Profil.\nn|Skizzenbuch|Jeden Tag eine Skizze|10|Zeichne etwas, das du heute siehst.;Schreib das Datum dazu.\nn|Dankbarkeitsbild|Was hat heute gutgetan?|10|Mal oder kleb etwas, wofür du heute dankbar bist.\nn|Wunschbild|Ziele für die Zeit nach der Klinik|20|Sammle Bilder und Worte für deine Ziele.;Kleb sie auf ein Blatt.\nn|Brief an mich|An dein zukünftiges Ich|10|Schreib, was du dir wünschst.;Leg den Brief weg und lies ihn später.\nn|Rezept aufschreiben|Ein Lieblingsessen|5|Schreib das Rezept eines Lieblingsessens auf.;Mit einer Erinnerung dazu.\nn|Bastelprojekt|Ergotherapie nutzen|30|Frag in der Ergotherapie nach einem Projekt.\nn|Kreatives Tagebuch|Bild und Text|10|Mal ein kleines Bild zu deinem Tag.;Schreib zwei Sätze dazu.\nn|Gedicht vorlesen|Laut und langsam|5|Nimm einen Gedichtband.;Lies ein Gedicht laut vor.\nn|Musik entdecken|Ein neues Genre|10|Hör drei Lieder aus einem Genre, das du nicht kennst.\nn|Skills-Karten gestalten|Deine Skills als Karten|15|Schreib deine liebsten Skills auf kleine Karten.;Gestalte sie bunt.\nn|Fotoalbum ordnen|Schöne Erinnerungen|15|Such Fotos aus, die dir guttun.;Ordne sie zu einem Album.\nn|Melodie erfinden|Summen und aufnehmen|10|Summ eine Melodie.;Nimm sie mit dem Handy auf.\nn|Kurzgeschichte lesen|In eine Geschichte abtauchen|15|Such dir eine Kurzgeschichte.;Lies sie in Ruhe.\nn|Sticker gestalten|Kleine Bilder ausschneiden|10|Mal kleine Motive.;Schneide sie aus.\nn|Kunst- oder Musikgruppe|Angebote der Station|45|Schau im Wochenplan nach Kunst- oder Musikgruppen.\nn|Stärken-Plakat|Was kann ich gut?|15|Schreib deine Stärken groß auf ein Plakat.;Häng es auf.\n#m\nh|~Langsam ausatmen|Atem verlangsamen|3|Setz dich hin, Füße fest auf den Boden.;4 Sekunden einatmen.;6 Sekunden langsam ausatmen.;Folge dem Kreis.\nh|STOPP|Erst anhalten, dann handeln|1|Stopp – halt inne, beweg dich nicht.;Schritt zurück – atme einmal tief.;Beobachte – was passiert gerade in dir?;Achtsam weiter – wähle einen Skill oder geh zur Pflege.\nh|Die Welle abwarten|Ein Drang kommt und geht wieder|10|Bleib in der Nähe anderer Menschen.;Beobachte den Drang, ohne ihm zu folgen.;Sag dir: „Das ist ein Gedanke, kein Befehl.“\nh|Box-Atmung|4 – 4 – 4 – 4|3|4 Sekunden einatmen.;4 Sekunden halten.;4 Sekunden ausatmen.;4 Sekunden halten.\nh|Füße spüren|Boden unter den Füßen|2|Stell beide Füße fest auf den Boden.;Drück sie leicht hinein.;Spür: Der Boden trägt dich.\nh|Bauchatmung|Hand auf den Bauch|3|Leg eine Hand auf den Bauch.;Atme so, dass sich die Hand hebt.;Atme langsam aus.\nh|Atemzüge zählen|Bis 10 und von vorn|3|Zähl jedes Ausatmen: 1, 2, 3 … bis 10.;Dann beginn von vorn.\nh|Seufzer-Atmung|Zweimal ein, lang aus|2|Atme zweimal kurz durch die Nase ein.;Atme lang durch den Mund aus.;5-mal wiederholen.\nh|Sicherer Satz|Einen Satz wiederholen|2|Sag dir leise: „Ich bin hier. Ich bin jetzt sicher.“;Wiederhole ihn bei jedem Ausatmen.\nh|Hand aufs Herz|Selbstberuhigung|2|Leg eine Hand aufs Herz.;Spür die Wärme und den Herzschlag.;Atme ruhig.\nh|Lippenbremse|Langsam durch die Lippen ausatmen|2|Atme durch die Nase ein.;Atme langsam durch leicht geschlossene Lippen aus.\nh|Halt im Raum|Drei feste Dinge|2|Such drei Dinge im Raum, die fest stehen.;Benenne sie leise.;Spür, dass auch du sicher stehst.\nh|Gefühl benennen|Was ist gerade da?|2|Sag leise: „Gerade spüre ich …“;Benenne das Gefühl so genau du kannst.\nh|Atem an der Nase|Den Atem spüren|3|Spür die kühlere Luft beim Einatmen an der Nase.;Spür die wärmere Luft beim Ausatmen.\nh|Drang beobachten|Alle 30 Sekunden einschätzen|5|Schätz den Drang alle 30 Sekunden von 0 bis 10.;Beobachte, wie er sich verändert.\nm|5-4-3-2-1|Mit den Sinnen ins Hier und Jetzt|3|Nenne 5 Dinge, die du siehst.;4 Dinge, die du hörst.;3 Dinge, die du spürst.;2 Dinge, die du riechst.;1 Sache, die du schmeckst.\nm|Kurzer Körpercheck|Von den Füßen bis zum Kopf|4|Spür nacheinander Füße, Beine, Bauch, Schultern und Gesicht.;Nur wahrnehmen, nichts verändern.\nm|Achtsames Gehen|Jeder Schritt bewusst|5|Geh sehr langsam.;Spür Ferse, Ballen und Zehen.\nm|Gedanken als Wolken|Vorbeiziehen lassen|5|Stell dir deine Gedanken als Wolken vor.;Lass sie vorbeiziehen, ohne sie festzuhalten.\nm|Gegenstand betrachten|Wie zum ersten Mal|3|Nimm einen Gegenstand.;Betrachte Farbe, Form und Details.\nm|Achtsam hören|Nur Geräusche|3|Schließ die Augen.;Zähl alle Geräusche, die du hörst.\nm|4-7-8-Atmung|Zum Runterkommen|3|4 Sekunden einatmen.;7 Sekunden halten.;8 Sekunden ausatmen.;Höchstens 4 Runden.\nm|Weiser Geist|Gefühl und Verstand zusammen|5|Was sagt mein Gefühl?;Was sagt mein Verstand?;Was sagen beide zusammen?\nm|Achtsam Hände waschen|Wasser, Seife, Duft|2|Wasch die Hände mit lauwarmem Wasser.;Spür Wasser und Seife ganz bewusst.\nm|Radikale Akzeptanz|Es ist, wie es ist|5|Sag dir: „Es ist gerade so, wie es ist.“;Atme dabei langsam aus.;Akzeptieren heißt nicht gutheißen.\nm|Beobachten ohne Bewerten|Nur beschreiben|5|Beschreib, was du siehst – ohne „gut“ oder „schlecht“.\nm|Halbes Lächeln|Das Gesicht entspannen|2|Entspann dein Gesicht.;Heb die Mundwinkel ganz leicht.\nm|Offene Hände|Bereitschaft statt Abwehr|2|Leg die Hände mit offenen Handflächen auf die Oberschenkel.;Atme ruhig.\nm|Atem-Meditation|5 Minuten beim Atem|5|Setz dich bequem hin.;Folge 5 Minuten deinem Atem.;Wenn Gedanken kommen, kehr zum Atem zurück.\nm|Gefühl im Körper|Wo sitzt es?|3|Wo im Körper spürst du das Gefühl?;Wie groß, wie warm, wie schwer ist es?\nm|Innerer Beobachter|Abstand nehmen|3|Sag: „Ich bemerke, dass ich denke …“;Das schafft Abstand zu dem Gedanken.\nm|Achtsam essen|Ein Stück Obst ganz langsam|3|Nimm ein Stück Obst.;Sieh es an, riech daran, schmeck ganz langsam.\nm|Achtsam Treppen gehen|Stufe für Stufe|3|Geh eine Treppe langsam.;Spür jeden Schritt.\nn|Achtsam trinken|Ein Glas Wasser oder Tee|3|Halt die Tasse in beiden Händen.;Spür die Wärme, riech, trink langsam.\nn|Morgen-Achtsamkeit|Drei Atemzüge vor dem Aufstehen|2|Bleib nach dem Aufwachen kurz liegen.;Nimm drei bewusste Atemzüge.\nn|Body-Scan|Ausführlich im Liegen|15|Leg dich hin.;Wandere mit der Aufmerksamkeit durch den ganzen Körper.\nn|Achtsamkeitsgruppe|Angebot der Station|30|Schau im Wochenplan nach der Achtsamkeitsgruppe.\nn|Abend-Rückblick|Drei Momente des Tages|5|Erinnere dich an drei Momente des Tages.;Beschreib sie, ohne zu bewerten.\nn|Achtsam duschen|Wasser auf der Haut|10|Dusch angenehm warm.;Spür Temperatur und Duft.\nn|Gute Wünsche|Für dich und andere|5|Wünsch dir: „Möge es mir gut gehen.“;Dann einem anderen Menschen.\nn|Mahlzeit ohne Handy|Mit allen Sinnen essen|15|Iss eine Mahlzeit ohne Ablenkung.;Achte auf Geschmack und Geruch.\nn|Himmel beobachten|Wolken, Licht, Farben|5|Schau 5 Minuten in den Himmel.\nn|Atem-Pause|Drei Minuten, drei Schritte|3|Minute 1: Was ist gerade da?;Minute 2: Nur der Atem.;Minute 3: Der ganze Körper.\nn|Dankbar atmen|Mit jedem Ausatmen ein Danke|3|Denk bei jedem Ausatmen an etwas, wofür du dankbar bist.\nn|Teeritual|Tee bewusst zubereiten|10|Koch Tee langsam und bewusst.;Riech am Tee, bevor du trinkst.\nn|Achtsam eincremen|Hände oder Gesicht|3|Creme dich langsam ein.;Spür die Berührung.\nn|Selbstmitgefühl|Freundlich zu dir|3|Sag: „Das ist gerade schwer.“;„Anderen geht es auch so.“;„Ich darf freundlich zu mir sein.“\nn|Achtsamer Spaziergang|Fünf Sinne draußen|15|Geh langsam.;Achte bei jedem Sinn auf eine Sache.\nn|Stündliche Atem-Erinnerung|Drei Atemzüge zur vollen Stunde|1|Nimm zu jeder vollen Stunde drei bewusste Atemzüge.\nn|Stille genießen|Zwei Minuten nichts tun|2|Setz dich hin.;Tu zwei Minuten bewusst nichts.\n#b\nh|Etwas Vertrautes halten|Stein, Kuscheltier, Foto|3|Nimm einen vertrauten Gegenstand.;Halt ihn fest in beiden Händen.;Beschreib dir Farbe, Form und Gewicht.\nh|Kaugummi kauen|Kräftig und bewusst|3|Kau einen Kaugummi kräftig.;Achte auf den Geschmack.\nh|Lieblingsduft riechen|Intensiv und bewusst|2|Riech an einem Duft, den du magst.;Beschreib ihn in drei Worten.\nh|Schwere Decke|Gewicht auf dem Körper|10|Leg dich unter eine schwere Decke.;Spür das Gewicht.\nh|Sich selbst umarmen|Arme fest um dich legen|2|Leg die Arme um dich.;Drück sanft, aber fest.;Atme ruhig.\nh|♪Kräftige Musik|Über Kopfhörer|4|Mach ein kräftiges Lied über Kopfhörer an.;Konzentrier dich auf ein einzelnes Instrument.\nh|Oberflächen fühlen|Stoff, Holz, Papier|3|Fühl 5 verschiedene Oberflächen.;Beschreib jede ganz genau.\nh|Gegenstand beschreiben|Als würdest du ihn erklären|3|Nimm einen Gegenstand.;Beschreib ihn so genau, als müsstest du ihn jemandem erklären.\nh|Hände warm reiben|Wärme erzeugen|1|Reib die Handflächen kräftig aneinander.;Leg sie warm auf Gesicht oder Nacken.\nh|Massageball abrollen|Unter dem Fuß|3|Roll einen weichen Massageball unter dem Fuß.;Mit angenehmem Druck.\nh|Pfefferminzbonbon|Frischer Geschmack|3|Lutsch ein Pfefferminzbonbon.;Spür die Frische im Mund.\nh|Rauschen hören|Regen oder Meeresrauschen|5|Hör Regengeräusche oder Meeresrauschen.;Lass dich davon einhüllen.\nh|Finger tippen|Daumen zu jedem Finger|2|Tipp mit dem Daumen nacheinander jeden Finger an.;Zähl dabei langsam mit.\nh|Lieblingsfoto ansehen|Ein Bild, das Halt gibt|2|Schau ein Foto an, das dir guttut.;Beschreib, was du siehst.\nh|Warme Tasse halten|Wärme in den Händen|3|Halt eine warme Tasse in beiden Händen.;Spür die Wärme.\nm|Angenehmer Duft|Lieblingscreme oder Tee|2|Riech bewusst an etwas, das du magst.;Beschreib den Duft in drei Worten.\nm|Einkuscheln|Decke, Tee, ruhige Musik|10|Wickel dich in eine Decke.;Mach dir einen warmen Tee.;Hör ruhige Musik oder genieß die Stille.\nm|Warme Dusche|Wärme auf der Haut|10|Dusch angenehm warm.;Spür das Wasser auf dem Rücken.\nm|Fußbad|Warmes Wasser für die Füße|10|Füll eine Schüssel mit angenehm warmem Wasser.;Stell die Füße hinein.\nm|Etwas Weiches halten|Kuscheltier oder Kissen|5|Halt etwas Weiches im Arm.;Atme ruhig.\nm|Duftsäckchen|Lavendel oder Lieblingsduft|3|Riech an einem Duftsäckchen.;Atme langsam ein.\nm|Snack genießen|Ganz langsam|5|Iss etwas, das du magst.;Ganz langsam, Bissen für Bissen.\nm|Haare bürsten|Gleichmäßige Bewegung|3|Bürste langsam deine Haare.;Spür jeden Strich.\nm|Kerzenlicht ansehen|Elektrische Kerze|5|Schau in das Licht einer LED-Kerze.;Folge dem Flackern.\nm|Naturgeräusche|Wald, Meer, Vögel|10|Hör Naturgeräusche über Kopfhörer.\nm|Bequeme Kleidung|Etwas Weiches anziehen|5|Zieh deine bequemsten Sachen an.\nm|Kakao trinken|Warm und süß|5|Mach dir einen Kakao.;Trink ihn langsam.\nm|Duft und Erinnerung|Woran erinnert dich der Duft?|3|Riech an etwas Vertrautem.;Denk an eine schöne Erinnerung dazu.\nm|Licht dimmen|Ruhige Umgebung|3|Mach grelles Licht aus.;Setz dich in gedämpftes Licht.\nm|Hände massieren|Sanfte Selbstmassage|3|Massier deine Handflächen mit dem Daumen.;Langsam und mit angenehmem Druck.\nm|Sanft wiegen|Vor und zurück|3|Setz dich in einen Schaukelstuhl oder wiege dich sanft hin und her.\nm|Ruhige Bilder|Meer, Wald, Tiere|5|Sieh dir ruhige Bilder an.;Bleib bei einem Bild hängen.\nm|Leise summen|Ein Lied, das du magst|3|Summ leise ein Lied, das du magst.\nn|♪Ruhige Musik hören|Bewusst zuhören|5|Wähle ein ruhiges Lied.;Hör nur zu – mit geschlossenen Augen, wenn du magst.\nn|Hände eincremen|Sich etwas Gutes tun|3|Nimm eine Creme, die du gern riechst.;Creme deine Hände langsam ein.\nn|Gesichtsmaske|Ein Pflege-Moment|15|Mach eine pflegende Gesichtsmaske.;Leg dich dabei hin.\nn|Wohlfühlecke|Kissen, Decke, Foto|15|Richte dir eine gemütliche Ecke ein.\nn|Lieblingsduft aussuchen|Für deinen Notfallkoffer|5|Such einen Duft aus, der dich beruhigt.;Pack ihn in deinen Notfallkoffer.\nn|Notfallkoffer packen|Eine Box für alle Sinne|15|Pack eine Box: Duft, Foto, Kaugummi, etwas Weiches.\nn|Sonnenlicht tanken|Licht ins Gesicht|5|Setz dich ans Fenster in die Sonne.\nn|Vorfreude|Etwas Leckeres planen|3|Überleg, was du dir als Nächstes gönnst.\nn|Nägel pflegen|Feilen und lackieren|10|Pflege deine Nägel in Ruhe.\nn|Rückenmassage mit Ball|Ball an der Wand|5|Leg einen weichen Ball zwischen Rücken und Wand.;Roll sanft hin und her.\nn|Neue Teesorte|Etwas Neues schmecken|5|Probier eine neue Teesorte.\nn|Kuschelsocken|Warme Füße|2|Zieh warme, weiche Socken an.\nn|Schlafritual|Ruhig in die Nacht|15|Licht dimmen, Handy weg, ruhige Musik.\nn|Wärmflasche|Wärme auf dem Bauch|10|Frag die Pflege nach einer Wärmflasche.;Leg sie auf den Bauch.\nn|Lieblingsfarben|Mit Farben beruhigen|10|Mal ein Bild nur mit deinen Lieblingsfarben.\nn|Klang nachhören|Klangschale oder Glöckchen|3|Schlag eine Klangschale an.;Hör zu, bis der Klang ganz verklungen ist.\nn|Frische Bettwäsche|Saubere Wäsche riechen|10|Bezieh dein Bett frisch.\n#c\nh|Pflege ansprechen|Du musst das nicht allein schaffen|1|Geh zum Pflegezimmer oder sprich die nächste Pflegekraft an.;Sag einfach: „Mir geht es gerade nicht gut.“;Du darfst das jederzeit – auch nachts.\nh|Unter Menschen gehen|Raus aus dem Zimmer|5|Verlass das Zimmer.;Geh in den Aufenthaltsraum.;Bleib unter Menschen, bis es leichter wird.\nh|In der Nähe des Teams sitzen|Nähe gibt Sicherheit|10|Frag, ob du dich in die Nähe des Pflegezimmers setzen darfst.\nh|Codewort sagen|Mit der Pflege vereinbart|1|Sag der Pflege dein vereinbartes Codewort.;Dann wissen alle Bescheid.\nh|Notfallplan zeigen|Lass dich unterstützen|2|Zeig der Pflege deinen Notfallplan.;Geht ihn gemeinsam durch.\nh|Mitpatienten fragen|Kurz zusammen sein|5|Frag, ob jemand kurz Zeit hat.;Ihr müsst nicht über Probleme reden.\nh|Vertraute Stimme|Jemanden anrufen|5|Ruf einen vertrauten Menschen an.;Sag ruhig, dass es dir gerade nicht gut geht.\nh|Gemeinsam atmen|Mit jemandem im Takt|3|Bitte jemanden, mit dir langsam zu atmen.\nh|Tür offen lassen|Nicht allein bleiben|5|Lass die Zimmertür offen.;Setz dich in Hörweite von anderen.\nh|Mit Begleitung raus|Gemeinsam an die Luft|10|Frag die Pflege, ob jemand mit dir rausgeht.\nh|Sprachnachricht hören|Eine liebe Stimme|2|Hör eine gespeicherte Sprachnachricht von jemandem, der dir guttut.\nh|Um Ablenkung bitten|Sag, was du brauchst|2|Sag jemandem: „Kannst du mich kurz ablenken?“\nh|Gemeinsam etwas tun|Puzzle oder Karten|10|Frag jemanden, ob ihr zusammen etwas spielt.\nh|Zettel schreiben|Wenn Reden zu schwer ist|3|Schreib auf einen Zettel, wie es dir geht.;Gib ihn der Pflege.\nh|Kurzgespräch einfordern|Mit der Bezugspflege|10|Frag nach einem kurzen Gespräch mit deiner Bezugspflege.\nm|Über etwas anderes reden|Mit Mitpatienten oder Pflege|10|Such dir jemanden, mit dem du gern sprichst.;Redet über Alltägliches: Essen, Musik, Serien.\nm|Einem vertrauten Menschen schreiben|Kurz Kontakt aufnehmen|5|Denk an einen Menschen, der dir guttut.;Schreib eine kurze Nachricht.\nm|Kompliment machen|Jemandem etwas Nettes sagen|2|Sag jemandem etwas Nettes.\nm|Gemeinsam Tee trinken|Kurze Pause zu zweit|10|Lade jemanden auf einen Tee ein.\nm|Anliegen klar sagen|Nach DBT: DEAR MAN|10|Beschreib die Situation.;Sag, was du fühlst und dir wünschst.;Bleib freundlich und klar.\nm|Zuhören|Jemandem Zeit schenken|10|Frag jemanden, wie es ihm geht.;Hör einfach zu.\nm|Koch- oder Backgruppe|Gemeinsam in der Küche|30|Frag nach der Koch- oder Backgruppe der Station.\nm|Lied teilen|Gemeinsam Musik hören|5|Zeig jemandem ein Lied, das du magst.\nm|Fragen stellen|Neugierig sein|5|Stell jemandem drei Fragen über sein Leben.\nm|Nein sagen üben|Freundlich und klar|5|Üb einen Satz: „Nein, das möchte ich nicht.“\nm|Brief schreiben|An einen wichtigen Menschen|15|Schreib einen Brief.;Ob du ihn abschickst, entscheidest du später.\nm|Gemeinsam lachen|Etwas Lustiges zeigen|5|Zeig jemandem ein lustiges Video oder Foto.\nm|Danke sagen|Für etwas Kleines|2|Bedank dich bei jemandem für etwas Kleines.\nm|Gruppe besuchen|Gemeinschaft erleben|45|Besuch eine Gruppe der Station.\nm|Hilfe anbieten|Etwas für andere tun|5|Hilf jemandem bei etwas Kleinem.\nm|Videoanruf|Ein vertrautes Gesicht sehen|10|Mach einen Videoanruf mit jemandem, der dir guttut.\nm|Gemeinsam puzzeln|Stück für Stück|20|Puzzelt zusammen im Aufenthaltsraum.\nm|Gefühle anderer anerkennen|Validieren üben|5|Sag zu jemandem: „Das klingt schwer.“\nn|Gemeinsam spielen|Tischtennis, Kicker, Karten|15|Frag jemanden von der Station, ob er mitmacht.;Spielt eine Runde – Gewinnen ist egal.\nn|Besuch planen|Wen möchtest du sehen?|5|Überleg, wen du gern sehen würdest.;Klär den Termin mit der Station.\nn|Kontaktliste|Menschen, die mir guttun|10|Schreib 5 Menschen auf, die dir guttun.\nn|Kartenspiel|UNO, Skat, Rommé|20|Spielt eine Runde Karten.\nn|Gemeinsam spazieren|Zu zweit raus|20|Geht zusammen eine Runde.\nn|Selbsthilfegruppe suchen|Für die Zeit nach der Klinik|10|Such eine Selbsthilfegruppe in deiner Nähe.\nn|Geburtstage notieren|Wichtige Menschen|10|Notier die Geburtstage von Menschen, die dir wichtig sind.\nn|Danke-Karte|Für jemanden auf der Station|10|Gestalte eine Danke-Karte.\nn|Gemeinsam essen|Am Tisch mit anderen|20|Iss mit anderen zusammen im Speiseraum.\nn|Brettspiel|Ein Spiel aussuchen|30|Such ein Brettspiel aus und frag, wer mitspielt.\nn|Stärken anderer sehen|Was mag ich an …?|5|Überleg, was du an einem Mitmenschen magst.\nn|Alte Kontakte|Sich wieder melden|10|Melde dich bei jemandem, von dem du lange nichts gehört hast.\nn|Gemeinsam basteln|Kreativ zu zweit|30|Bastelt gemeinsam etwas.\nn|Neue begrüßen|Willkommen auf Station|2|Sag einer neuen Person Hallo.\nn|Gesprächsthemen sammeln|Für leichte Gespräche|5|Schreib drei Themen auf, über die du gern sprichst.\nn|Visite vorbereiten|Dein Anliegen notieren|10|Schreib auf, was du in der Visite sagen möchtest.\nn|Filmabend vorschlagen|Wenn die Station es erlaubt|90|Schlag einen Film für den Aufenthaltsraum vor.\n#n\nh|Frische Luft am Fenster|Fenster auf, tief durchatmen|2|Öffne ein Fenster.;Atme die frische Luft ein.;Schau in die Ferne.\nh|Raus in den Hof|Wenn es erlaubt ist|10|Sag der Pflege Bescheid.;Geh in den Hof.\nh|Zügig ums Gebäude|Mit der Pflege abgesprochen|10|Sprich es mit der Pflege ab.;Geh zügig eine Runde ums Gebäude.\nh|Bäume zählen|Den Blick nach außen|3|Zähl alle Bäume, die du siehst.\nh|Wind spüren|Am offenen Fenster|2|Stell dich ans offene Fenster.;Spür den Wind auf der Haut.\nh|Barfuß auf Gras|Wenn es warm genug ist|5|Zieh die Schuhe aus.;Spür das Gras unter den Füßen.\nh|Farben draußen suchen|Fünf Farben|3|Such draußen 5 verschiedene Farben.\nh|Vögel hören|Wie viele verschiedene?|3|Hör auf Vogelstimmen.;Zähl, wie viele verschiedene es sind.\nh|Wolken beschreiben|Form und Farbe|3|Beschreib Form und Farbe der Wolken.\nh|Etwas Natürliches halten|Blatt, Stein, Zapfen|3|Halt ein Blatt oder einen Stein in der Hand.;Beschreib ihn ganz genau.\nh|Regen beobachten|Tropfen am Fenster|5|Schau den Regentropfen am Fenster zu.;Folge einem Tropfen.\nh|Pflanze gießen|Eine kleine Aufgabe|2|Gieß eine Pflanze.;Schau sie dir genau an.\nh|Sonne im Gesicht|Kurz ins Licht|3|Stell dich in die Sonne.;Schließ die Augen.\nh|Geräusche draußen|Was hörst du?|3|Zähl alle Geräusche, die von draußen kommen.\nh|Naturvideo|Wenn du nicht rauskannst|5|Schau ein ruhiges Naturvideo.\nm|Spaziergang draußen|In ruhigem Tempo|15|Sprich mit der Pflege ab, ob du rausdarfst.;Geh 15 Minuten in ruhigem Tempo.\nm|Fotospaziergang|5 schöne Kleinigkeiten|10|Geh über das Gelände.;Fotografiere 5 schöne Kleinigkeiten.;Such dein Lieblingsfoto aus.\nm|Auf der Parkbank|Hinsetzen und schauen|10|Setz dich auf eine Bank.;Beobachte, was um dich passiert.\nm|Blätter sammeln|Verschiedene Formen|10|Sammle 5 verschiedene Blätter.\nm|Wolkenbilder|Formen erkennen|5|Such Tiere oder Gesichter in den Wolken.\nm|Natur-Bingo|Liste abhaken|15|Such: Vogel, Blume, Stein, Moos, Käfer.\nm|Gartenarbeit|Wenn es einen Garten gibt|20|Frag nach Gartenarbeit.\nm|Pflanze umtopfen|Hände in die Erde|15|Topf eine Pflanze um.\nm|Tiere beobachten|Vögel, Eichhörnchen|10|Beobachte ein Tier eine Weile.\nm|Sonnenuntergang|Bewusst anschauen|10|Schau dir den Sonnenuntergang an.\nm|Barfuß gehen|Verschiedene Böden spüren|5|Geh barfuß über Gras oder Sand, wenn es möglich ist.\nm|Draußen atmen|Fünf tiefe Atemzüge|2|Atme draußen fünfmal tief ein und aus.\nm|Jahreszeit entdecken|Was ist gerade typisch?|10|Such Zeichen der Jahreszeit.\nm|Lieblingsstein suchen|Einer, der gut in der Hand liegt|10|Such einen Stein, der gut in der Hand liegt.\nm|Naturgeräusche aufnehmen|Mit dem Handy|5|Nimm Vogelgesang oder Wind auf.\nm|Licht und Schatten|Genau hinschauen|5|Beobachte, wie Licht und Schatten fallen.\nm|Baum spüren|Die Hand auf die Rinde|3|Leg die Hand an einen Baum.;Spür die Rinde.\nm|Draußen lesen|Ein paar Seiten|15|Nimm ein Buch mit nach draußen.;Lies ein paar Seiten.\nn|Frische Luft planen|Eine feste Zeit|5|Plan eine feste Zeit am Tag für frische Luft.\nn|Zimmerpflanze pflegen|Etwas Lebendiges|5|Kümmer dich um eine Pflanze.\nn|Kresse säen|Beim Wachsen zusehen|10|Sä Kresse auf feuchte Watte.;Schau jeden Tag nach.\nn|Wetter-Tagebuch|Jeden Tag notieren|3|Notier das Wetter und wie du dich fühlst.\nn|Naturfoto als Hintergrund|Ein ruhiges Bild|3|Setz ein Naturfoto als Handy-Hintergrund.\nn|Morgenluft|Fenster nach dem Aufstehen|2|Öffne morgens kurz das Fenster.\nn|Blumen pressen|Für später|15|Leg Blumen zwischen die Seiten eines Buches.\nn|Ausflug planen|Für nach der Klinik|10|Plan einen Ausflug in die Natur.\nn|Waldspaziergang|Wenn es erlaubt ist|30|Geh in den Wald, wenn es möglich ist.\nn|Sternenhimmel|Am Abend|5|Schau abends nach den Sternen.\nn|Vögel füttern|Wenn es erlaubt ist|5|Leg Vogelfutter aus.\nn|Naturdoku|Eine Folge|30|Schau eine Naturdokumentation.\nn|Draußen frühstücken|Wenn es warm ist|20|Iss draußen.\nn|Natur-Mandala|Aus Blättern und Steinen|20|Leg ein Mandala aus Naturmaterialien.\nn|Gartengruppe|Angebot der Klinik|45|Frag nach der Gartengruppe.\nn|Tageslicht am Morgen|10 Minuten Licht|10|Geh morgens ins Tageslicht.\nn|Tiergestützte Angebote|Klinikhund oder Tiere|30|Frag nach tiergestützten Angeboten.\n#d\nh|Laut benennen|Den Kopf nach außen lenken|2|Nenne laut 10 blaue Dinge im Raum.;Dann 10 runde Dinge.;Dann 10 Dinge mit S.\nh|Rückwärts rechnen|Von 100 in Siebenerschritten|2|Starte bei 100.;Zieh immer 7 ab: 93, 86, 79 …;Sag die Zahlen halblaut.\nh|Tier-Alphabet|Von A bis Z|3|Nenne zu jedem Buchstaben ein Tier.\nh|Länder aufzählen|So viele wie möglich|3|Zähl Länder auf.;Dann Städte.\nh|Rückwärts buchstabieren|Lange Wörter|2|Buchstabier „Krankenhaus“ rückwärts.;Dann ein anderes langes Wort.\nh|Zahlen addieren|Immer weiter|2|Rechne 3 + 4 + 5 + 6 … immer weiter.\nh|Kategorien-Spiel|5 Dinge pro Thema|3|Nenne 5 Obstsorten, 5 Automarken, 5 Farben.\nh|Liedtext aufsagen|Auswendig|3|Sag einen Liedtext auswendig auf.\nh|Wie ein Reporter|Den Raum beschreiben|3|Beschreib den Raum laut wie ein Reporter.\nh|Wörter bilden|Aus „SONNENSCHEIN“|3|Bilde möglichst viele Wörter aus den Buchstaben.\nh|Dreierschritte|Bis 99 zählen|2|Zähl in Dreierschritten: 3, 6, 9 … bis 99.\nh|Nach Farben sortieren|Stifte oder Gegenstände|3|Sortier Stifte oder Gegenstände nach Farbe.\nh|Kopfrechnen|10 Aufgaben|3|Löse 10 Rechenaufgaben im Kopf.\nh|Pro und Contra|Kurz- und langfristig abwägen|5|Was bringt es mir, dem Drang nachzugeben – jetzt und morgen?;Was bringt es mir, ihn auszuhalten – jetzt und morgen?\nh|Kleinstes Detail|Genau hinsehen|3|Such im Raum das kleinste Detail.\nm|Rätsel lösen|Sudoku, Kreuzworträtsel|10|Nimm ein Rätselheft vom Stationsregal.;Löse ein Rätsel, ohne auf die Zeit zu achten.\nm|Puzzle|Stück für Stück|20|Mach ein Puzzle.\nm|Eine Folge schauen|Ablenkung mit Ende|25|Schau eine Folge, die dich ablenkt.;Danach ist Schluss.\nm|Hörspiel|Kurz abtauchen|15|Hör ein Hörspiel.\nm|Wissensquiz|Allgemeinwissen|10|Mach ein Quiz.\nm|Ein Kapitel lesen|In ein Buch eintauchen|15|Lies ein Kapitel.\nm|Handyspiel mit Timer|Höchstens 10 Minuten|10|Stell dir einen Timer.;Spiel ein ruhiges Spiel.\nm|Top-10-Liste|Filme, Essen, Orte|5|Schreib deine Top 10 auf.\nm|Etwas Neues lernen|Ein Thema, das dich interessiert|10|Lies über ein Thema, das dich interessiert.\nm|Schach oder Dame|Eine Partie|20|Spiel eine Partie gegen jemanden oder die App.\nm|Wortsuche|Buchstabengitter|10|Löse ein Wortsuchrätsel.\nm|Zehn Vokabeln|Eine Fremdsprache|10|Lern 10 Wörter einer Fremdsprache.\nm|Gedanken-Stopp|Bewusst umlenken|2|Denk laut „Stopp“.;Lenk deine Aufmerksamkeit bewusst auf etwas anderes.\nm|Zeitschrift blättern|Bilder anschauen|10|Blätter eine Zeitschrift durch.\nm|Memory|Paare finden|10|Spiel eine Runde Memory.\nm|Lieblingsfilm nacherzählen|Kopfkino|5|Erzähl dir einen Lieblingsfilm Szene für Szene nach.\nm|Traumwohnung|Im Kopf einrichten|5|Stell dir vor, wie du deine Traumwohnung einrichtest.\nm|Leichtes Sudoku|Zum Einstieg|15|Löse ein leichtes Sudoku.\nn|Hörbuch oder Podcast|Eine Geschichte hören|15|Such dir ein Hörbuch oder einen Podcast aus.;Hör 15 Minuten zu.\nn|Doku schauen|Etwas lernen|30|Schau eine Dokumentation.\nn|Neues Buch|Die ersten Seiten|20|Fang ein Buch an.\nn|Rätselheft besorgen|Für die nächsten Tage|5|Hol dir ein Rätselheft.\nn|Interessen sammeln|Was interessiert mich?|10|Schreib Themen auf, die dich interessieren.\nn|Erklärvideo|Eine neue Fähigkeit|15|Schau ein Erklärvideo zu etwas, das du lernen willst.\nn|Gedächtnistraining|10 Wörter merken|5|Merk dir 10 Wörter.;Schreib sie nach 5 Minuten auf.\nn|Strategiespiel|Ruhig nachdenken|20|Spiel ein Strategiespiel.\nn|Leichte Nachrichten|Lokale Zeitung|15|Lies leichte, lokale Nachrichten.\nn|Kreuzworträtsel|Eine Seite|15|Löse ein Kreuzworträtsel.\nn|Hobby suchen|Etwas Neues ausprobieren|10|Such nach einem Hobby, das dich reizt.\nn|Gedanken sortieren|Aufschreiben und ordnen|10|Schreib deine Gedanken auf.;Ordne sie nach wichtig und unwichtig.\nn|Film aussuchen|Für den Abend|5|Such einen Film für den Abend aus.\nn|Ein Thema am Tag|Kleine Wissensportion|5|Lern jeden Tag etwas über ein neues Thema.\nn|Logikrätsel|Knobeln|10|Löse ein Logikrätsel.\nn|Fakten sammeln|Drei interessante Dinge|5|Sammle drei interessante Fakten.\nn|Quiz mit anderen|Gemeinsam raten|15|Macht zusammen ein Quiz.\n#a\nh|Nächster Schritt|Nur eine einzige Sache|2|Was ist das Allernächste?;Tu nur das.\nh|Raum wechseln|Ein anderer Ort|2|Steh auf und geh in einen anderen Raum.\nh|Wasser trinken|Ein ganzes Glas|2|Trink langsam ein Glas Wasser.\nh|Gesicht waschen|Mit lauwarmem Wasser|2|Wasch dein Gesicht mit lauwarmem Wasser.;Trockne es sanft ab.\nh|Etwas essen|Ein kleiner Snack|5|Iss etwas Kleines.;Hunger verstärkt Anspannung.\nh|Bett machen|Kleine Ordnung|3|Mach dein Bett.\nh|Schublade sortieren|Nur eine|5|Sortier eine einzige Schublade.\nh|Tisch abwischen|Etwas mit den Händen tun|5|Wisch einen Tisch ab.;Gründlich, Stück für Stück.\nh|Kleidung falten|Gleichmäßig und ruhig|5|Falte ein paar Kleidungsstücke.\nh|Drei Möglichkeiten|Aufschreiben und wählen|3|Schreib drei Dinge auf, die du jetzt tun kannst.;Wähle eins und fang an.\nh|Zehn-Minuten-Timer|Nur bis dahin durchhalten|1|Stell einen Timer auf 10 Minuten.;Bis dahin machst du nur einen Skill.\nh|Notfallkoffer öffnen|Deine vorbereiteten Dinge|2|Hol deinen Notfallkoffer.;Nimm eine Sache heraus.\nh|Zähne putzen|Routine gibt Halt|3|Putz deine Zähne langsam und gründlich.\nh|Umziehen|Frische Kleidung|5|Zieh frische Sachen an.\nh|Absprachen lesen|Dein Plan mit dem Team|3|Lies deine Absprachen mit dem Team.\nm|Eine Ecke aufräumen|Ordnung außen, Ruhe innen|5|Such dir eine kleine Ecke: Nachttisch, Tasche, Schrankfach.;Räum nur diese Ecke auf.\nm|Duschen|Mit Lieblingsduft|10|Dusch in Ruhe.;Nimm dein Lieblingsduschgel.\nm|Wäsche waschen|Eine Aufgabe erledigen|20|Wasch deine Wäsche, wenn es möglich ist.\nm|Wochenplan ansehen|Was steht an?|5|Schau in den Wochenplan der Station.\nm|Drei To-dos|Kleine Aufgaben|5|Schreib drei kleine Aufgaben für heute auf.\nm|Haare machen|Pflege für dich|10|Mach deine Haare.\nm|Tasche packen|Für morgen|5|Pack deine Tasche für morgen.\nm|Papiere ordnen|Briefe und Formulare|15|Sortier deine Papiere.\nm|Einkaufsliste|Was brauche ich?|5|Schreib auf, was du brauchst.\nm|Handy aufräumen|Fotos und Apps|10|Lösch alte Fotos oder sortier deine Apps.\nm|Mahlzeit planen|Was esse ich als Nächstes?|5|Plan dein nächstes Essen.\nm|Wasser bereitstellen|Genug trinken|1|Stell dir eine Flasche Wasser hin.\nm|Ein Schrankfach|Kleiderschrank sortieren|10|Sortier ein Fach im Schrank.\nm|Termine eintragen|Kalender pflegen|5|Trag deine Termine ein.\nm|Pause einplanen|Bewusst ausruhen|3|Plan eine Pause für heute.\nm|Tisch schön machen|Etwas Schönes hinstellen|5|Stell etwas Schönes auf deinen Tisch.\nm|Schlafzeiten notieren|Muster erkennen|3|Notier, wann du schlafen gehst und aufwachst.\nm|Geschafft-Liste|Was habe ich heute erledigt?|3|Schreib auf, was du heute geschafft hast.\nn|Feste Zeiten|Dem Tag einen Rahmen geben|2|Steh zur gleichen Zeit auf.;Iss zu den Mahlzeiten der Station.;Geh zur gleichen Zeit ins Bett.\nn|Etwas Gutes notieren|Drei Dinge von heute|3|Schreib drei Dinge auf, die heute okay waren.;Auch Kleinigkeiten zählen.\nn|Etwas Schönes planen|Eine angenehme Aktivität|3|Was hat dir früher Freude gemacht?;Plan eine kleine Sache davon für heute oder morgen.\nn|@Frühwarnzeichen prüfen|Notfallplan ansehen|2|Lies deine Frühwarnzeichen im Notfallplan.;Ergänze, was dir neu auffällt.\nn|Tagesplan|Am Morgen schreiben|5|Schreib einen Plan für den Tag.\nn|Wochenziel|Ein kleines Ziel|5|Setz dir ein kleines Ziel für diese Woche.\nn|Abendroutine|Ruhig ausklingen|15|Handy weg, Licht dimmen, Tee trinken.\nn|Morgenroutine|Gut in den Tag starten|15|Aufstehen, waschen, frühstücken.\nn|Handy-Pause|Bildschirmzeit begrenzen|2|Stell eine Handy-Pause ein.\nn|Ziele für zu Hause|Nach der Entlassung|10|Schreib drei Ziele für die Zeit zu Hause auf.\nn|Belohnung planen|Für erreichte Ziele|3|Plan eine kleine Belohnung.\nn|Kleine Aufgabe übernehmen|Alltag üben|10|Übernimm eine kleine Aufgabe auf Station.\nn|Skills-Tagebuch|Welche Skills heute?|5|Notier die Skills, die du heute genutzt hast.\nn|Freude-Liste|20 Dinge, die guttun|15|Schreib 20 Dinge auf, die dir Freude machen.\nn|Schlafregeln|Das Bett nur zum Schlafen|3|Lies die Schlafregeln.;Wähle eine aus, die du heute umsetzt.\nn|Gut gemacht|Was ist mir gelungen?|3|Schreib eine Sache auf, die du heute gut gemacht hast.\nn|Wochenrückblick|Was lief gut?|10|Was lief diese Woche gut?;Was willst du ändern?\n";
+const SKILLS=[]; (()=>{ let area=null, i=0; RAW.split("\n").forEach(line=>{ line=line.trim(); if(!line) return; if(line[0]==="#"){ area=line.slice(1); i=0; return; }
+  let [t,title,sub,min,steps]=line.split("|"); const f={}; while("!♪~@".includes(title[0])){ f[title[0]]=1; title=title.slice(1); }
+  SKILLS.push({id:area+(++i),area,tier:{h:"hoch",m:"mittel",n:"niedrig"}[t],t:title,s:sub,min:+min,steps:steps.split(";"),intens:!!f["!"],spotify:!!f["♪"],breath:!!f["~"],plan:!!f["@"]}); }); })();
+const byId=id=>SKILLS.find(s=>s.id===id);
+/* ===== Materielle Hilfsmittel: Skill → Produkt-Suche ===== */
+const ITEMS=[
+ {id:"ball",t:"Knautschball",i:"🟠",d:"Zum festen Drücken bei hoher Anspannung",q:"Antistressball Knautschball",sk:["s3","s8","s12"]},
+ {id:"ring",t:"Fidget-Ring (Spinner-Ring)",i:"💍",d:"Unauffällig drehen und spielen",q:"Spinner Ring Fidget Ring",sk:["b13","b7"]},
+ {id:"fidget",t:"Fidget-Spielzeug-Set",i:"🧩",d:"Pop-it, Würfel, Knautschfiguren",q:"Fidget Toys Set Erwachsene",sk:["b7","b13"]},
+ {id:"knete",t:"Therapieknete",i:"🟣",d:"Kneten, drücken, formen",q:"Therapieknete",sk:["k6","k16"]},
+ {id:"massage",t:"Weicher Massageball",i:"🔵",d:"Glatt, zum Abrollen unter dem Fuß",q:"Massageball glatt weich",sk:["b10","b43"]},
+ {id:"decke",t:"Gewichtsdecke",i:"🛏️",d:"Gewicht auf dem Körper beruhigt",q:"Gewichtsdecke",sk:["b4","b17"]},
+ {id:"kirsch",t:"Kirschkernkissen",i:"🍒",d:"Wärme für Bauch und Nacken",q:"Kirschkernkissen",sk:["b47"]},
+ {id:"stein",t:"Handschmeichler-Stein",i:"🪨",d:"Etwas Vertrautes zum Festhalten",q:"Handschmeichler Stein",sk:["b1","n10"]},
+ {id:"duft",t:"Lavendel-Duftsäckchen",i:"💜",d:"Beruhigender Duft für unterwegs",q:"Lavendel Duftsäckchen",sk:["b3","b16","b21","b38"]},
+ {id:"kuschel",t:"Kuschelkissen",i:"🧸",d:"Etwas Weiches zum Halten",q:"Kuschelkissen Plüsch",sk:["b20"]},
+ {id:"kopfhoerer",t:"Kopfhörer",i:"🎧",d:"Für Musik und Naturgeräusche",q:"Kopfhörer Over-Ear",sk:["k5","b6","b12","b25","b34"]},
+ {id:"klang",t:"Klangschale",i:"🔔",d:"Einem Klang nachhören",q:"Klangschale klein",sk:["b49","m21"]},
+ {id:"kerze",t:"LED-Kerzen",i:"🕯️",d:"Ruhiges Licht ohne Feuer",q:"LED Kerzen flackernd",sk:["b24","b29"]},
+ {id:"socken",t:"Kuschelsocken",i:"🧦",d:"Warme, weiche Füße",q:"Kuschelsocken",sk:["b45"]},
+ {id:"mandala",t:"Mandala-Malbuch",i:"🌀",d:"Für Erwachsene, mit Buntstiften",q:"Mandala Malbuch Erwachsene",sk:["k18","k16","k19"]},
+ {id:"block",t:"Großer Zeichenblock und dicke Stifte",i:"🖍️",d:"Zum Kritzeln und großflächigen Malen",q:"Zeichenblock A3 Wachsmalstifte",sk:["k2","k8","k4"]},
+ {id:"finger",t:"Fingerfarben",i:"🎨",d:"Mit den Händen malen",q:"Fingerfarben Erwachsene",sk:["k11"]},
+ {id:"origami",t:"Origami-Papier",i:"🦢",d:"Falten, Schritt für Schritt",q:"Origami Papier Set",sk:["k13"]},
+ {id:"stricken",t:"Strick- oder Häkelset",i:"🧶",d:"Ruhige Handarbeit",q:"Häkelset Anfänger",sk:["k25","k32"]},
+ {id:"malzahlen",t:"Malen nach Zahlen",i:"🖼️",d:"Fläche für Fläche",q:"Malen nach Zahlen Erwachsene",sk:["k33"]},
+ {id:"steine",t:"Steine und Acrylstifte",i:"✏️",d:"Steine bemalen",q:"Acrylstifte Steine bemalen",sk:["k28"]},
+ {id:"notiz",t:"Notizbuch",i:"📓",d:"Für Gefühle, Gedanken und Gutes",q:"Notizbuch A5 liniert",sk:["k17","k7","a35","k41","m38"]},
+ {id:"raetsel",t:"Rätselheft",i:"🔢",d:"Sudoku und Kreuzworträtsel",q:"Rätselheft Sudoku Kreuzworträtsel",sk:["d16","d33","d43","d37"]},
+ {id:"puzzle",t:"Puzzle",i:"🧩",d:"Allein oder gemeinsam",q:"Puzzle 500 Teile",sk:["d17","c32"]},
+ {id:"karten",t:"Kartenspiel",i:"🃏",d:"Für gemeinsame Runden",q:"UNO Kartenspiel",sk:["c37","c34","c13"]},
+ {id:"matte",t:"Yogamatte",i:"🧘",d:"Für Dehnen und Yoga",q:"Yogamatte",sk:["s33","s25","s43"]},
+ {id:"tt",t:"Tischtennis-Set",i:"🏓",d:"Schläger und Bälle",q:"Tischtennis Set Schläger",sk:["s37"]},
+ {id:"kresse",t:"Kresse-Samen",i:"🌱",d:"Beim Wachsen zusehen",q:"Kresse Samen",sk:["n36"]}
+];
+const itemsFor=id=>ITEMS.filter(it=>it.sk.includes(id));
+const shopUrl=it=>"https://www.amazon.de/s?k="+encodeURIComponent(it.q);
+const cmpUrl=it=>"https://www.idealo.de/preisvergleich/MainSearchProductCategory.html?q="+encodeURIComponent(it.q);
+const itemCard=(it,note)=>`<div class="item"><span class="ii">${it.i}</span><span class="it"><b>${esc(it.t)}</b><small>${esc(note||it.d)}</small>
+  <span class="il"><a href="${shopUrl(it)}" target="_blank" rel="noopener">Bei Amazon ansehen ↗</a><a href="${cmpUrl(it)}" target="_blank" rel="noopener">Preise vergleichen ↗</a></span></span></div>`;
+const shopNote=`<p class="muted" style="font-size:14px;margin-top:8px">Vorher mit der Pflege absprechen, was auf Station erlaubt ist.</p>`;
+function helpedItems(){ const good=new Set(); Object.values(myList()).flat().filter(o=>o.good).forEach(o=>good.add(o.s.id));
+  return ITEMS.map(it=>({it,via:it.sk.filter(id=>good.has(id)).map(id=>byId(id).t)})).filter(x=>x.via.length); }
+
+/* ===== Hilfen ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const color=v=>v>=7?"var(--red)":v>=4?"var(--yellow)":"var(--green)";
+function tierOf(mode,v){ if(mode==="sui") return v>=5?"hoch":v>=1?"mittel":"niedrig"; return v>=7?"hoch":v>=4?"mittel":"niedrig"; }
+function toast(t){ const d=document.createElement("div"); d.className="toast"; d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),2200); }
+let timerId=null; function stopTimer(){ if(timerId){ clearInterval(timerId); timerId=null; } }
+const validSpotify=u=>/^https:\/\/open\.spotify\.com\//.test(u)||/^spotify:/.test(u);
+const ageNow=()=>cur.sos?cur.sosAge:(S.account?S.account.age:null);
+const senior=()=>{ const a=ageNow(); return a!=null&&a>=SENIOR; };
+const fits=s=>!(senior()&&s.intens);
+const nameOf=()=>S.account?S.account.name:"";
+const HELP={ja:{l:"Ja",i:"👍",v:2},etwas:{l:"Ein bisschen",i:"🤏",v:1},nein:{l:"Nein",i:"👎",v:-2}};
+const trigLabel=k=>k?(TRIGGERS[k]?TRIGGERS[k].l:k):"";
+const val=(p,m)=>p.all&&p.all[m]!=null?p.all[m]:(p.mode===m?p.v:null);
+const valsText=p=>Object.keys(MODES).map(m=>val(p,m)!=null?MODES[m].label+" "+val(p,m):null).filter(Boolean).join(", ");
+const RK={hoch:2,mittel:1,niedrig:0};
+const sev=p=>Math.max(...Object.keys(MODES).map(m=>{ const v=val(p,m); return v==null?-1:RK[tierOf(m,v)]*20+v+(m==="sui"?10:0); }));
+const PROBS=["Gedankenkreisen","Angst","Traurigkeit","Wut","Leere","Einsamkeit","Schlafprobleme","Neben mir stehen"];
+function probCounts(ps){ const m=new Map(); (ps||S.points).filter(p=>p.ctx==="check"&&p.prob).forEach(p=>p.prob.forEach(t=>{ const k=t.toLowerCase(); const o=m.get(k)||{t,n:0}; o.n++; m.set(k,o); })); return [...m.values()].sort((a,b)=>b.n-a.n); }
+const normTrig=t=>{ t=(t||"").trim().replace(/\s+/g," "); return t?t[0].toUpperCase()+t.slice(1):""; };
+const trigKey=t=>TRIGGERS[t]?t:t.toLowerCase();
+function trigCounts(ps){ const m=new Map(); (ps||S.points).filter(p=>p.ctx==="check"&&p.trig).forEach(p=>{ const k=trigKey(p.trig); const o=m.get(k)||{t:p.trig,n:0}; o.n++; m.set(k,o); }); return [...m.values()].sort((a,b)=>b.n-a.n); }
+function trigChips(){ const used=trigCounts(), seen=new Set(used.map(o=>trigKey(o.t)));
+  const rest=[...myTriggers(),...Object.keys(TRIGGERS)].filter(t=>{ const k=trigKey(t); if(seen.has(k)) return false; seen.add(k); return true; }).map(t=>({t,n:0}));
+  return [...used,...rest].slice(0,10); }
+const myTriggers=()=>{ const a=S.account||{}; return [...(a.triggers||[]), ...((a.ownTriggers||"").split("\n").map(s=>s.trim()).filter(Boolean))]; };
+const fmtTime=t=>new Date(t).toLocaleString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+
+/* ===== Lern-Algorithmus: Skill- und Kategorie-Wirkung aus dem eigenen Protokoll ===== */
+const nach=()=>S.points.filter(p=>p.ctx==="nach");
+const drop=p=>p.v1==null?0:p.v1-p.v;
+const eff=p=>drop(p)+(HELP[p.helped]?HELP[p.helped].v:0);
+const ctxTier=p=>p.ctxTier||tierOf(p.mode,p.v1!=null?p.v1:p.v);
+function score(id,tier){ let es=nach().filter(p=>p.id===id); if(tier){ const t=es.filter(p=>ctxTier(p)===tier); if(t.length) es=t; } return es.length?es.reduce((s,p)=>s+eff(p),0)/es.length:null; }
+function catStats(tier){ const o={}; Object.keys(AREAS).forEach(k=>o[k]={n:0,sum:0,drop:0}); let L=nach(); if(tier){ const t=L.filter(p=>ctxTier(p)===tier); if(t.length>=3) L=t; } L.forEach(p=>{ const s=byId(p.id); if(!s) return; const c=o[s.area]; c.n++; c.sum+=eff(p); c.drop+=drop(p); });
+  Object.values(o).forEach(c=>{ c.score=c.n?c.sum/c.n:null; c.avgDrop=c.n?c.drop/c.n:null; }); return o; }
+function hash32(str){ let h=2166136261; for(const c of str){ h^=c.charCodeAt(0); h=Math.imul(h,16777619); } return h>>>0; }
+function areaList(area,tier,exclude,off){
+  const pool=SKILLS.filter(s=>s.area===area&&s.tier===tier&&!s.plan&&fits(s)&&!exclude.includes(s.id));
+  const good=pool.filter(s=>(score(s.id,tier)||0)>0.5).sort((x,y)=>score(y.id,tier)-score(x.id,tier));
+  const neu=pool.filter(s=>score(s.id,tier)==null).sort((x,y)=>hash32(x.id+off)-hash32(y.id+off));
+  const bad=pool.filter(s=>{ const v=score(s.id,tier); return v!=null&&v<=0.5; });
+  return [...good,...neu,...bad];
+}
+function rankAreas(mode,trig,avoid,tier){ const cs=catStats(tier), tc=TRIGGERS[trig]?TRIGGERS[trig].c:[];
+  return Object.keys(AREAS).map(k=>({k,r:(cs[k].score||0)+(mode==="sui"?({c:6,m:3,b:2}[k]||0):0)+(tc.includes(k)?2:0)+(k===avoid?-10:0),cs:cs[k]})).sort((a,b)=>b.r-a.r); }
+function suggest(tier,mode,exclude,avoid,off,trig){
+  const ar=rankAreas(mode,trig,avoid,tier), out=[], used=new Set();
+  const take=(area,k,why)=>{ const l=areaList(area,tier,exclude.concat(out.map(o=>o.s.id)),off); const s=l[k%Math.max(l.length,1)]; if(s&&!used.has(s.id)){ out.push({s,why}); used.add(s.id); } };
+  const top=ar[0], strong=top.cs.score!=null&&top.cs.score>=2;
+  take(top.k,off,top.cs.score>0?`Weil dir ${AREAS[top.k].label} oft hilft`:(TRIGGERS[trig]&&TRIGGERS[trig].c.includes(top.k)?`Passt zu „${trigLabel(trig)}“`:""));
+  if(strong) take(top.k,off,`Weil dir ${AREAS[top.k].label} oft hilft`); else { const b=ar[1]; take(b.k,off,b.cs.score>0?`Weil dir ${AREAS[b.k].label} oft hilft`:""); }
+  const rest=ar.slice(strong?1:2); const e=rest[off%rest.length]; take(e.k,0,"Zum Ausprobieren");
+  for(const a of ar){ if(out.length>=3) break; take(a.k,off,""); }
+  return out.slice(0,3);
+}
+
+let cur={mode:"a",v:null,focus:"a",a:null,sv:null,sui:null,prob:[],vals:null,trig:null,off:0,skill:null,tier:"mittel",before:null,tried:[],filter:null,tierF:"alle",q:"",sos:false,sosAge:null,helped:null,fm:"protokoll",openCat:[],openTier:[],more:[],range:7,open:[],trigFrom:"how"};
+
+function skillBtn(x){ const s=x.id?x:x.s, why=x.id?"":x.why, sc=score(s.id);
+  return `<button class="skill" data-id="${s.id}"><span class="tag">${AREAS[s.area].icon} ${AREAS[s.area].label}</span>${sc!=null&&sc>0.5?`<em>hat dir geholfen</em>`:""}<b>${esc(s.t)}</b><span class="s">${esc(s.s)} · ${s.min} Min.</span>${why?`<span class="why2">${esc(why)}</span>`:""}</button>`; }
+const pflege=(t)=>`<div class="pflege"><span class="i">🤝</span><span>${t||"Wird es zu viel? Sprich <b>jederzeit</b> die Pflege an – auch nachts."}</span></div>`;
+function scaleCard(key,label,lo,hi,v,sub){
+  return `<div class="card"><div class="row"><b>${sub?`<span class="muted" style="font-size:13px;font-weight:500;display:block">${sub}</span>`:""}${label}</b><span class="val" id="v-${key}" style="color:${v==null?"var(--muted)":color(v)}">${v==null?"–":v}</span></div>
+    <div class="ticks" role="radiogroup" aria-label="${label} 0 bis 10">${Array.from({length:11},(_,i)=>`<button role="radio" aria-checked="${v===i}" data-k="${key}" data-n="${i}" class="${v===i?"on":""}" style="${v===i?`background:${color(i)}`:""}">${i}</button>`).join("")}</div>
+    <div class="scale"><span>0 ${lo}</span><span>10 ${hi}</span></div></div>`;
+}
+function bindTicks(cb){ document.querySelectorAll(".ticks button").forEach(b=>b.onclick=()=>{ const k=b.dataset.k,n=+b.dataset.n; cur[k]=n;
+  document.querySelectorAll(`.ticks button[data-k="${k}"]`).forEach(z=>{ const on=+z.dataset.n===n; z.classList.toggle("on",on); z.style.background=on?color(n):""; z.setAttribute("aria-checked",on); });
+  const v=$("#v-"+k); v.textContent=n; v.style.color=color(n); cb&&cb(); }); }
+const ready=()=>cur.v!=null;
+const allSet=()=>Object.keys(MODES).every(m=>cur[m]!=null);
+function scales(){ const m=MODES[cur.mode]; return scaleCard("v",m.label,m.lo,m.hi,cur.v); }
+function dayTip(){ const best=rankAreas("sv",null,null)[0].k, pool=SKILLS.filter(s=>s.area===best&&s.tier!=="hoch"&&!s.plan&&fits(s)); const d=new Date(); return pool[(d.getFullYear()*372+d.getMonth()*31+d.getDate())%pool.length]; }
+const tierHead=t=>`<span class="zone ${TIERS[t].cls}">${TIERS[t].label}</span>`;
+function suiCard(){ const r=S.plan.reasons.trim();
+  return `<div class="card help"><h2 style="margin-top:0">Bitte geh jetzt zur Pflege.</h2><p>Suizidgedanken sind ein Grund, sofort mit jemandem zu sprechen. Du störst nicht – dafür sind wir da.</p></div>
+    ${r?`<div class="card"><b>Was mir wichtig ist</b><p style="white-space:pre-line">${esc(r)}</p></div>`:""}`; }
+function bars(rows,max){ max=max||10; return `<div class="bars">${rows.map(([l,v,c,txt])=>v==null?"":`<span>${l}</span><div class="bar"><i style="width:${Math.max(0,Math.min(100,v/max*100))}%;background:${c||color(v)}"></i></div><span>${txt!=null?txt:v}</span>`).join("")}</div>`; }
+
+function notfallSkills(){ const cs=catStats("hoch"), out=[];
+  Object.keys(AREAS).filter(k=>cs[k].n&&cs[k].score>0).sort((a,b)=>cs[b].score-cs[a].score).slice(0,3).forEach(k=>{
+    const ids=[...new Set(nach().map(p=>p.id))].filter(id=>{ const sk=byId(id); return sk&&sk.area===k&&!sk.plan&&fits(sk)&&(sk.tier==="hoch"||nach().some(p=>p.id===id&&ctxTier(p)==="hoch"))&&score(id,"hoch")>0.5; }).sort((a,b)=>score(b,"hoch")-score(a,"hoch"));
+    out.push(ids.length?byId(ids[0]):SKILLS.find(x=>x.area===k&&x.tier==="hoch"&&fits(x))); });
+  ["c1","m1","s2","b1","d2"].forEach(id=>{ const sk=byId(id); if(out.length<3&&!out.some(o=>o.area===sk.area)) out.push(sk); });
+  return out; }
+/* ===== Tägliche Belohnung: Lichtpunkte sammeln – nie verlieren, keine Serien, die abreißen ===== */
+const QUOTES=["Du bist heute hier. Das allein zählt schon.","Gefühle sind wie Wellen – auch diese geht vorbei.","Du musst heute nicht perfekt sein. Ein kleiner Schritt reicht.",
+ "Jeder Skill, den du ausprobierst, ist Training – auch wenn er nicht sofort hilft.","Anspannung ist unangenehm, aber du kannst sie aushalten.","Um Hilfe zu bitten ist Stärke, kein Versagen.",
+ "Du bist mehr als deine schwersten Momente.","Es zählt nicht, wie weit du bist, sondern dass du weitergehst.","Ein Gedanke ist ein Gedanke – kein Befehl.",
+ "Atme länger aus als ein. Dein Körper versteht das.","Sei heute so freundlich zu dir wie zu einem guten Freund.","Rückschritte gehören dazu. Sie löschen deinen Fortschritt nicht.",
+ "Kleine Dinge zählen: Wasser trinken, aufstehen, aus dem Fenster schauen.","Du hast schon schwere Tage überstanden. Das ist Beweis genug.","Was du heute übst, hilft dir morgen.",
+ "Du musst nicht alles allein schaffen. Das Team ist da.","Akzeptieren heißt nicht gutheißen. Es heißt: Ich fange von hier aus an.","Nimm dir heute eine Sache vor – nur eine.",
+ "Stärke sieht manchmal aus wie: einfach durchhalten.","Dein Wert hängt nicht von deiner Leistung ab.","Gefühle sind Informationen, keine Urteile.",
+ "Ein schwerer Moment ist kein schwerer Tag – und kein schweres Leben.","Heute darfst du langsam sein.","Jede Welle erreicht irgendwann den Strand.",
+ "Du lernst gerade etwas sehr Schweres. Das verdient Respekt.","Frag dich heute: Was tut mir gut?","Pausen sind kein Aufgeben.","Du bist nicht allein mit dem, was du fühlst.",
+ "Mut heißt, trotzdem einen Schritt zu machen.","Sei stolz auf das, was andere nicht sehen.","Auch kleine Fortschritte sind Fortschritte.","Heute ist ein neuer Anfang – und morgen auch."];
+const LEVELS=[[0,"Funke","✨"],[5,"Glut","🔥"],[15,"Flamme","🕯️"],[30,"Leuchtfeuer","🏮"],[60,"Leuchtturm","🗼"],[120,"Polarstern","🌟"]];
+const dayKey=t=>{ const d=new Date(t); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); };
+const dayIdx=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
+const todayQuote=()=>QUOTES[dayIdx()%QUOTES.length];
+function level(pts){ let i=0; LEVELS.forEach((l,j)=>{ if(pts>=l[0]) i=j; }); const cur=LEVELS[i], nxt=LEVELS[i+1]; return {name:cur[1],icon:cur[2],next:nxt,pct:nxt?Math.round((pts-cur[0])/(nxt[0]-cur[0])*100):100}; }
+function addPoint(kind){ const r=S.rewards=S.rewards||{points:0,days:[],today:{}}; const k=dayKey(Date.now()); if(!r.today||r.today.k!==k) r.today={k,skills:0};
+  if(kind==="day"){ if(r.days.includes(k)) return false; r.days.push(k); r.points++; save(); return true; }
+  if(kind==="skill"&&r.today.skills<5){ r.today.skills++; r.points++; save(); return true; } return false; }
+function rewardCard(){ const r=S.rewards||{points:0,days:[]}, L=level(r.points);
+  return `<div class="reward"><span class="ri">${L.icon}</span><span style="flex:1"><b>${r.points} Lichtpunkte · ${L.name}</b><span class="muted" style="font-size:14px">${L.next?`noch ${L.next[0]-r.points} bis ${L.next[1]} ${L.next[2]}`:"Höchste Stufe erreicht"} · ${r.days.length} Tage dabei</span><div class="prog"><i style="width:${L.pct}%"></i></div></span></div>`; }
+function dailyGreeting(){ if(!addPoint("day")) return; const L=level(S.rewards.points), up=LEVELS.some(l=>l[0]===S.rewards.points&&l[0]>0);
+  const o=document.createElement("div"); o.className="overlay";
+  o.innerHTML=`<div class="card pop" style="text-align:center"><div style="font-size:46px">${up?L.icon:"☀️"}</div><h2 style="margin:6px 0">Schön, dass du da bist${nameOf()?", "+esc(nameOf()):""}!</h2>
+    <p class="quote">„${esc(todayQuote())}“</p><p class="muted">+1 Lichtpunkt${up?` · Neue Stufe: <b>${L.name}</b>`:""}</p><button class="btn" id="dg">Danke</button></div>`;
+  document.body.appendChild(o); o.querySelector("#dg").onclick=()=>{ o.remove(); go("start",true,true); }; }
+
+/* ===== Wissen: Skills verstehen (nach DBT, Bohus & Wolf-Arehult; in eigenen Worten) ===== */
+const KNOW=[
+ ["Was sind Skills?","Skills sind Fertigkeiten, mit denen du starke Gefühle und Anspannung selbst beeinflussen kannst – ohne dir zu schaden. Sie stammen aus der Dialektisch-Behavioralen Therapie (DBT). Wie beim Sport gilt: Je öfter du übst, desto besser wirken sie."],
+ ["Die Spannungskurve","0–3 niedrig: Achtsamkeit und Alltag üben. 4–6 mittel: Gefühle regulieren, mit anderen sprechen, ablenken. 7–10 Hochspannung: Jetzt helfen nur noch kräftige, schnelle Skills für Körper und Sinne – Nachdenken klappt in diesem Bereich kaum."],
+ ["Die fünf Module","Achtsamkeit · Stresstoleranz (Krisen überstehen) · Umgang mit Gefühlen · Zwischenmenschliche Fertigkeiten · Selbstwert. In der Skills-Gruppe der Station lernst du sie nach und nach."],
+ ["Früh anfangen","Skills wirken am besten, wenn du sie früh einsetzt – bei 4 oder 5, nicht erst bei 9. Achte auf deine Frühwarnzeichen im Notfallplan."],
+ ["Skills-Kette","Wenn ein Skill nicht reicht, nimm direkt den nächsten. Zwei oder drei hintereinander sind normal. Calmius schlägt dir nach jeder Bewertung einen neuen vor."],
+ ["Notfallkoffer","Pack dir eine kleine Box mit Dingen, die dir bei Hochspannung helfen – etwas zum Drücken, ein Duft, ein Foto, Musik. So hast du alles griffbereit."],
+ ["Wann zur Pflege?","Immer, wenn es zu viel wird – und bei Suizidgedanken sofort. Skills ersetzen keine Menschen. Das Team ist rund um die Uhr für dich da."]];
+/* ===== Demo-Daten für die Testversion ===== */
+function demo(){ const pts=[], now=Date.now(), H=3600e3; let seed=7; const rnd=()=>{ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; };
+  const helpful={s:.8,m:.75,k:.7,c:.6,b:.6,n:.55,a:.45,d:.35}, trigs=["abend","allein","streit","kritik","laerm","leere","Anruf von zu Hause","abend","allein"];
+  for(let day=20;day>=0;day--){ const base=4.2+day/20*2.6;
+    for(let j=0;j<3;j++){ const hour=[9,14,20][j]+rnd()*.8; const t0=now-day*24*H-(new Date().getHours()-hour)*H; if(t0>now) continue;
+      const r=rnd(), raw=base+(hour>19?1.2:0)+(rnd()*4-2), cl=(x,lo)=>Math.max(lo,Math.min(10,Math.round(x)));
+      const all={a:cl(raw,1),sv:cl(raw-1.5+rnd()*2-1,0),sui:cl(raw*.35-0.8+rnd()*2-1,0)};
+      const mode=all.sui>=3&&r<.5?"sui":r<.6?"a":"sv", v=all[mode], trig=trigs[Math.floor(rnd()*trigs.length)], prob=rnd()<.4?[PROBS[Math.floor(rnd()*4)]]:undefined;
+      pts.push({t:t0,mode,v,all,ctx:"check",trig,prob});
+      if(tierOf(mode,v)!=="niedrig"){ const areas=Object.keys(helpful); const ar=areas[Math.floor(rnd()*areas.length)], tier=tierOf(mode,v), pool=SKILLS.filter(s=>s.area===ar&&s.tier===tier&&!s.plan); const sk=pool[Math.floor(rnd()*Math.min(6,pool.length))];
+        const ok=rnd()<helpful[ar], d=ok?1+Math.floor(rnd()*3):Math.floor(rnd()*2), nv=Math.max(0,v-d);
+        pts.push({t:t0+15*60e3,mode,v:nv,ctx:"nach",id:sk.id,skill:sk.t,v1:v,helped:ok?(d>=2?"ja":"etwas"):"nein",trig,ctxTier:tier}); } } }
+  return pts.filter(p=>p.t<=now).sort((a,b)=>b.t-a.t); }
+/* ===== Ansichten ===== */
+const V={
+  welcome(){ return `<img class="logoimg" src="icon-192.png" alt=""><div class="brand">Calmius</div><p>Deine Skills für Anspannung, Druck und einen stabilen Alltag – immer dabei.</p>
+      ${S.account&&!S.account.test?`<button class="btn" data-go="login">Anmelden</button>`:`<button class="btn" data-go="register">Konto erstellen</button>`}
+      <button class="btn sec" id="test">Testversion ohne Konto (für das Team)</button>
+      <button class="btn red" id="sos">Sofort-Hilfe ohne Anmeldung</button>
+      <p class="foot">Konto und Daten bleiben nur auf diesem Handy.</p>`; },
+  register(){ return `<h1>Konto erstellen</h1><p class="muted">Dein Konto wird nur auf diesem Handy gespeichert – kein Server, keine Weitergabe.</p>
+      <label for="r-name">Vorname oder Spitzname</label><input id="r-name" maxlength="30" autocomplete="nickname">
+      <label for="r-age">Alter</label><input id="r-age" type="number" inputmode="numeric" min="12" max="110" placeholder="z. B. 34">
+      <label for="r-mail">E-Mail</label><input id="r-mail" type="email" autocomplete="email">
+      <label for="r-pw">Passwort (mind. 6 Zeichen)</label><input id="r-pw" type="password" autocomplete="new-password">
+      <label for="r-pw2">Passwort wiederholen</label><input id="r-pw2" type="password" autocomplete="new-password">
+      <p class="err" id="err"></p><button class="btn" id="reg">Weiter</button><button class="link" data-go="welcome">Zurück</button>`; },
+  triggers(){ const a=S.account, sel=a.triggers||[];
+    return `<h1>Deine Auslöser</h1><p class="muted">Was bringt dich häufig in Anspannung? Tipp alles an, was passt. Die App schlägt dir dann passende Skills vor.</p>
+      <div class="chips">${Object.entries(TRIGGERS).map(([k,t])=>`<button class="chip ${sel.includes(k)?"on":""}" data-t="${k}">${t.l}</button>`).join("")}</div>
+      <label for="own">Eigene Auslöser (einer pro Zeile)</label><textarea id="own" placeholder="z. B. Telefonate mit meiner Mutter">${esc(a.ownTriggers||"")}</textarea>
+      <button class="btn" id="trigok">${cur.trigFrom==="profil"?"Speichern":"Weiter"}</button>`; },
+  login(){ return `<h1>Anmelden</h1>
+      <label for="l-mail">E-Mail</label><input id="l-mail" type="email" autocomplete="email" value="${esc(S.account?S.account.email:"")}">
+      <label for="l-pw">Passwort</label><input id="l-pw" type="password" autocomplete="current-password">
+      <p class="err" id="err"></p><button class="btn" id="li">Anmelden</button><button class="link" id="forgot">Passwort vergessen?</button>
+      <button class="btn red" id="sos">Sofort-Hilfe ohne Anmeldung</button>`; },
+  sosAge(){ return `<h1>Sofort-Hilfe</h1><label for="sa">Wie alt bist du?</label>
+      <input id="sa" type="number" inputmode="numeric" min="12" max="110" placeholder="Alter">
+      <p class="err" id="err"></p><button class="btn" id="saok">Weiter</button><button class="link" data-go="welcome">Zurück</button>`; },
+  sos(){ return `<span class="zone z-hoch">Sofort-Hilfe</span>
+      <div class="card help"><h2 style="margin-top:0">Geh jetzt zur Pflege.</h2><p>Du musst das nicht allein schaffen. Sag einfach: „Mir geht es gerade nicht gut.“</p></div>
+      <h2>Was dir sofort helfen kann</h2>${suggest("hoch","sv",[],null,cur.off,null).map(skillBtn).join("")}
+      <button class="btn sec" id="more">Andere Vorschläge</button><button class="btn sec" data-go="welcome">Zurück</button>`; },
+  how(){ return `<h1>${esc(nameOf())}, so funktioniert Calmius</h1>
+      <ol class="how"><li><b>Einschätzen:</b> Du wählst, worum es gerade geht, und gibst Anspannung, Selbstverletzungsdruck und Suizidgedanken von 0 bis 10 an.</li>
+        <li><b>Skill machen:</b> Aus 400 Skills in 8 Kategorien bekommst du drei passende – abgestimmt auf dein Alter und deine Auslöser.</li>
+        <li><b>Bewerten:</b> Danach sagst du, ob es geholfen hat. Die App lernt mit und schlägt dir öfter vor, was dir hilft.</li></ol>
+      <div class="card help"><b>Wichtig:</b> Die Pflege kannst du jederzeit ansprechen. Bei Suizidgedanken bitte immer.</div>
+      <button class="btn" id="howdone">Los geht's</button>`; },
+  start(){ const last=S.points[0], h=new Date().getHours(), greet=h<11?"Guten Morgen":h<18?"Hallo":"Guten Abend", best=rankAreas("sv",null,null)[0];
+    return `${S.account.test?`<span class="testbadge">Testversion</span>`:""}<p class="muted">${new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}</p>
+      <h1>${greet}, ${esc(nameOf())}</h1>
+      <p class="quote" style="color:#d9d3ee">„${esc(todayQuote())}“</p>
+      ${rewardCard()}
+      <button class="hero" data-go="check"><b>Wie geht es mir gerade?</b><span>Einschätzen und passende Skills bekommen</span></button>
+      <h2>Meine Bereiche</h2><div class="areas">${Object.entries(AREAS).map(([k,a])=>`<button class="area" data-area="${k}">${best.cs.score>0&&best.k===k?`<span class="star">⭐</span>`:""}<span class="i">${a.icon}</span><b>${a.label}</b></button>`).join("")}</div>
+      <h2>Heute für dich</h2>${skillBtn({s:dayTip(),why:best.cs.score>0?`Aus ${AREAS[best.k].label} – hilft dir oft`:""})}
+      ${(()=>{ const lc=S.points.find(p=>p.ctx==="check"); return lc?`<h2>Letzte Einschätzung</h2><div class="card"><div class="row"><span class="muted">${fmtTime(lc.t)}</span></div>${bars(Object.keys(MODES).map(m=>[MODES[m].label.replace("Selbstverletzungsdruck","Druck"),val(lc,m)]))}</div>`:""; })()}
+      ${pflege()}`; },
+  check(){ return `<h1>Worum geht es gerade?</h1>
+      ${Object.entries(MODES).map(([k,m])=>`<button class="choice" data-mode="${k}" style="border-left:4px solid ${m.c}"><span class="muted" style="font-size:13px">Kategorie ${m.n}</span><b>${m.label}</b><span>${m.d}</span></button>`).join("")}
+      <p class="muted">Danach schätzt du alle drei Werte ein. Weitere Probleme wie Gedankenkreisen kannst du dort zusätzlich angeben.</p>${pflege()}`; },
+  rate(){ const f=cur.focus, order=MODES[f]?[f,...Object.keys(MODES).filter(m=>m!==f)]:Object.keys(MODES), pc=probCounts();
+    const probs=[...new Set([...pc.map(o=>o.t),...PROBS])].slice(0,10);
+    const probBlock=`<label>${f==="x"?"Worum geht es?":"Weitere Probleme?"} <span class="muted">${f==="x"?"":"(freiwillig)"}</span></label>
+      <div class="chips">${probs.map(t=>{ const n=(pc.find(o=>o.t.toLowerCase()===t.toLowerCase())||{}).n; return `<button class="chip ${cur.prob.some(x=>x.toLowerCase()===t.toLowerCase())?"on":""}" data-prob="${esc(t)}">${esc(t)}${n?` <span style="opacity:.6">${n}×</span>`:""}</button>`; }).join("")}</div>
+      <input id="probtxt" maxlength="60" placeholder="Anderes Problem selbst eintragen" style="margin-top:10px">`;
+    return `<span class="tag">${MODES[f]?MODES[f].label:"Etwas anderes"}</span><h1 style="margin-top:8px">Wie geht es dir gerade?</h1><p class="muted">Bitte alle drei Werte antippen. Es gibt kein Richtig oder Falsch.</p>
+      ${f==="x"?probBlock:""}
+      ${order.map((m,i)=>scaleCard(m,MODES[m].label,MODES[m].lo,MODES[m].hi,cur[m],"Kategorie "+MODES[m].n).replace('class="card"',i===0&&MODES[f]?'class="card focus"':'class="card"')).join("")}
+      ${f!=="x"?probBlock:""}
+      <label>Was hat es ausgelöst? <span class="muted">(freiwillig)</span></label>
+      <div class="chips">${trigChips().map(o=>`<button class="chip ${cur.trig&&trigKey(cur.trig)===trigKey(o.t)?"on":""}" data-trig="${esc(o.t)}">${esc(trigLabel(o.t))}${o.n?` <span style="opacity:.6">${o.n}×</span>`:""}</button>`).join("")}</div>
+      <input id="trigtxt" maxlength="60" placeholder="Oder selbst eintragen, z. B. Anruf von zu Hause" style="margin-top:10px">
+      <button class="btn" id="go" ${allSet()?"":"disabled"}>Was hilft mir jetzt?</button>`; },
+  hilfe(){ const t=cur.tier; let h=tierHead(t);
+    if(cur.vals&&cur.vals.sui>=1) h+=suiCard();
+    else if(t==="hoch") h+=`<div class="card help"><h2 style="margin-top:0">${esc(nameOf())}, geh jetzt zur Pflege.</h2><p>Du musst das nicht allein schaffen. Auf dem Weg oder während du wartest: einer dieser Skills.</p></div>`;
+    else h+=`<h2>Drei Vorschläge für dich</h2>`;
+    if(senior()) h+=`<p class="age">✓ Körperübungen an dein Alter angepasst</p>`;
+    h+=suggest(t,cur.vals&&cur.vals.sui>=1?"sui":cur.mode,cur.tried,null,cur.off,cur.trig).map(skillBtn).join("")+`<button class="btn sec" id="more">Andere Vorschläge</button>`;
+    const own=S.plan.skills.split("\n").map(s=>s.trim()).filter(Boolean);
+    if(own.length) h+=`<h2>Meine eigenen Skills</h2><div class="chips">${own.map(o=>`<span class="chip">${esc(o)}</span>`).join("")}</div>`;
+    return h+pflege(); },
+  skill(){ const s=cur.skill, sp=S.spotify&&validSpotify(S.spotify);
+    return `<span class="tag">${AREAS[s.area].icon} ${AREAS[s.area].label}</span>${tierHead(s.tier).replace('class="zone','style="font-size:13px;padding:2px 9px" class="zone')}
+      <h1 style="margin-top:10px">${esc(s.t)}</h1><p class="why">${esc(AREAS[s.area].why)}</p>
+      <ol class="steps">${s.steps.map(z=>`<li>${esc(z)}</li>`).join("")}</ol>
+      ${s.spotify?`<a class="btn spot" href="${esc(sp?S.spotify:"https://open.spotify.com/")}" target="_blank" rel="noopener">▶ ${sp?"Meine Playlist in Spotify öffnen":"Spotify öffnen"}</a>`:""}
+      ${itemsFor(s.id).length&&!cur.sos?`<div class="card shop"><b>🛒 Das kann dabei helfen</b>${itemsFor(s.id).map(it=>itemCard(it)).join("")}${shopNote}</div>`:""}
+      ${s.breath?`<div class="breath" id="br">ein</div>`:""}
+      <div class="timer" id="tm">${s.min}:00</div>
+      <button class="btn" id="start">Timer starten</button><button class="btn sec" id="done">${cur.sos?"Fertig":"Fertig – jetzt bewerten"}</button>${pflege()}`; },
+  eval(){ return `<h1>Hat dir „${esc(cur.skill.t)}“ geholfen?</h1>
+      <div class="eval">${Object.entries(HELP).map(([k,h])=>`<button data-h="${k}"><span class="i">${h.i}</span>${h.l}</button>`).join("")}</div>${pflege()}`; },
+  rate2(){ return `<h1>${cur.before?"Und wie ist es jetzt?":"Wie geht es dir jetzt?"}</h1>${!cur.before?`<div class="seg">${Object.entries(MODES).map(([k,m])=>`<button class="${cur.mode===k?"on":""}" data-m2="${k}">${m.label.replace("Selbstverletzungsdruck","Druck")}</button>`).join("")}</div>`:""}${cur.before?`<p class="muted">Vorher: ${MODES[cur.mode].label} ${cur.before.v}</p>`:""}
+      ${scales()}<button class="btn" id="saveAfter" ${ready()?"":"disabled"}>Weiter</button>`; },
+  ergebnis(){ const e=S.points[0], t=tierOf(e.mode,e.v), down=e.v1==null?null:drop(e), m=MODES[e.mode];
+    let h=`<h1>Deine Übersicht</h1><div class="card"><div class="row"><b>${esc(e.skill)}</b><span class="muted">${HELP[e.helped].i} ${HELP[e.helped].l}</span></div>
+      ${bars([[m.label.replace("Selbstverletzungsdruck","Druck")+" vorher",e.v1],["jetzt",e.v]])}
+      <p style="margin-top:10px">${down==null?"Danke für deine Bewertung.":down>0?`Runter um ${down} ${down===1?"Punkt":"Punkte"}. Gut gemacht!`:down<0?"Es ist gestiegen. Das passiert – gut, dass du es merkst.":"Gleich geblieben. Gut, dass du es versucht hast."}</p>
+      <p class="muted">Gespeichert. Die App merkt sich, was dir hilft.</p></div>`;
+    if(e.helped!=="nein"&&itemsFor(e.id).length) h+=`<div class="card shop"><b>🛒 Das hat dir geholfen – auch für zu Hause</b>${itemsFor(e.id).map(it=>itemCard(it)).join("")}${shopNote}</div>`;
+    if(e.mode==="sui"&&e.v>=1||cur.vals&&cur.vals.sui>=1&&e.mode!=="sui") h+=suiCard();
+    else if(t==="hoch") h+=`<div class="card help"><h2 style="margin-top:0">Noch hoch? Geh jetzt zur Pflege.</h2><p>Das ist kein Versagen – genau dafür sind wir da.</p></div>`;
+    if(t!=="niedrig") h+=`<h2>${e.helped==="nein"?"Probier etwas ganz anderes":"Noch ein Skill für dich"}</h2>`+suggest(t,cur.vals&&cur.vals.sui>=1?"sui":e.mode,cur.tried,e.helped==="nein"?byId(e.id).area:null,cur.off,cur.trig).map(skillBtn).join("")+`<button class="btn sec" id="more">Andere Vorschläge</button>`;
+    else h+=`<p>Leg das Handy jetzt kurz weg und gönn dir einen Moment.</p>`;
+    return h+`<button class="btn sec" data-go="start">Zur Startseite</button>`+pflege(); },
+  skills(){ const q=cur.q.toLowerCase().trim();
+    const mini=sk=>`<button class="skill mini" data-id="${sk.id}"><b>${esc(sk.t)}</b><span class="s">${esc(sk.s)} · ${sk.min} Min.</span></button>`;
+    const ko=cur.openCat.includes("know");
+    let h=`<h1>Skills</h1><p class="muted">Alle Skills nach Bereichen geordnet. Antippen zum Aufklappen.</p>
+      <button class="acc ${ko?"open":""}" data-oc="know" style="border-color:rgba(111,208,201,.45)"><span class="i">📘</span><span><b>Skills verstehen</b><small>Was Skills sind und wie sie wirken</small></span><span class="chev">›</span></button>
+      ${ko?`<div class="card know">${KNOW.map(([t,x])=>`<div class="kcard"><b>${t}</b><p>${x}</p></div>`).join("")}</div>`:""}
+      <input id="q" type="search" placeholder="Skill suchen …" value="${esc(cur.q)}">`;
+    if(q){ const l=SKILLS.filter(sk=>fits(sk)&&(sk.t+" "+sk.s).toLowerCase().includes(q)); return h+`<p class="muted">${l.length} Treffer</p>`+l.map(sk=>skillBtn(sk)).join("")+pflege(); }
+    h+=Object.entries(AREAS).map(([k,ar])=>{ const open=cur.openCat.includes(k), all=SKILLS.filter(sk=>sk.area===k&&fits(sk));
+      let body=""; if(open) body=`<div class="accbody">`+["hoch","mittel","niedrig"].map(t=>{ const l=all.filter(sk=>sk.tier===t), o=cur.openTier.includes(k+t);
+        return `<button class="acc2 ${o?"open":""}" data-ot="${k+t}"><span class="zone ${TIERS[t].cls}" style="font-size:13px;padding:2px 9px">${TIERS[t].range}</span>${TIERS[t].label}<small class="muted" style="font-weight:400">${l.length}</small><span class="chev">›</span></button>${o?l.map(mini).join(""):""}`; }).join("")+`</div>`;
+      return `<button class="acc ${open?"open":""}" data-oc="${k}"><span class="i">${ar.icon}</span><span><b>${ar.label}</b><small>${all.length} Skills</small></span><span class="chev">›</span></button>${body}`; }).join("");
+    return h+pflege(); },
+  fuermich(){ const seg=`<div class="seg">${[["protokoll","Protokoll"],["liste","Meine Liste"],["wirkung","Was hilft"],["wann","Wann"]].map(([k,l])=>`<button class="${cur.fm===k?"on":""}" data-fm="${k}">${l}</button>`).join("")}</div>`;
+    if(!S.points.length) return `<h1>Für mich</h1>${seg}<p class="muted">Noch keine Einträge. Nach deiner ersten Einschätzung siehst du hier, was dir hilft.</p>`;
+    return `<h1>Für mich</h1><p class="muted">Deine persönliche Auswertung – gern fürs Bezugspflegegespräch.</p>${seg}${FM[cur.fm]()}`; },
+  plan(){ const p=S.plan, nf=notfallSkills(); return `<h1>Mein Notfallplan</h1><p class="muted">Am besten gemeinsam mit deiner Bezugspflege ausfüllen. Wird automatisch gespeichert.</p>
+      <div class="card nfs"><b>🛟 Meine Notfall-Skills</b>${nf.map(sk=>skillBtn(sk)).join("")}</div>
+      <label for="p-warn">Meine Frühwarnzeichen</label><textarea id="p-warn" placeholder="z. B. ich ziehe mich zurück, kann nicht still sitzen …">${esc(p.warn)}</textarea>
+      <label for="p-skills">Skills, die mir helfen (einer pro Zeile)</label><textarea id="p-skills" placeholder="z. B. Musik laut hören&#10;mit Mitpatientin spazieren">${esc(p.skills)}</textarea>
+      <label for="p-people">Menschen, die ich ansprechen kann</label><textarea id="p-people" placeholder="z. B. Bezugspflege, Pflege im Dienst, meine Schwester">${esc(p.people)}</textarea>
+      <label for="p-reasons">Was mir wichtig ist – wofür es sich lohnt</label><textarea id="p-reasons" placeholder="z. B. mein Hund, meine Kinder, das Konzert im Sommer">${esc(p.reasons)}</textarea>${pflege()}`; },
+  profil(){ const a=S.account, tr=myTriggers(); return `<div class="row" style="justify-content:flex-start;gap:14px"><div class="avatar">${esc((a.name||"?")[0].toUpperCase())}</div><div><h1 style="margin:0">${esc(a.name)}</h1><p class="muted">${a.test?"Testversion – kein Konto":esc(a.email)}</p></div></div>
+      <label for="pn">Name</label><input id="pn" maxlength="30" value="${esc(a.name)}">
+      <label for="pa">Alter</label><input id="pa" type="number" inputmode="numeric" min="12" max="110" value="${a.age==null?"":a.age}">
+      <p class="muted">Ab ${SENIOR} Jahren blendet die App intensive Körperübungen aus.</p>
+      <div class="card"><div class="row"><b>⚡ Meine Auslöser</b><button class="link" style="width:auto;margin:0" id="edtrig">Bearbeiten</button></div>
+        <div class="chips">${tr.length?tr.map(k=>`<span class="chip">${esc(trigLabel(k))}</span>`).join(""):`<span class="muted">Noch keine eingetragen</span>`}</div></div>
+      <div class="card"><div class="row"><b>🎵 Spotify</b><span class="muted">${S.spotify?"verbunden":"nicht verbunden"}</span></div>
+        <p class="muted">Füg den Link deiner Playlist ein (in Spotify: Playlist › Teilen › Link kopieren).</p>
+        <input id="sp" type="url" placeholder="https://open.spotify.com/playlist/…" value="${esc(S.spotify)}"><p class="err" id="sperr"></p>
+        <button class="btn spot" id="spsave">Playlist verbinden</button>${S.spotify?`<a class="btn sec" href="${esc(S.spotify)}" target="_blank" rel="noopener">Playlist testen</a>`:""}</div>
+      <div class="card"><h2 style="margin-top:0">Datenschutz</h2><p>Alles bleibt nur auf diesem Handy. Das Passwort wird nur verschlüsselt (als Hash) gespeichert. Nichts geht an die Klinik oder ins Internet.</p></div>
+      <button class="btn sec" id="intro">Einführung noch einmal ansehen</button>
+      ${a.test?`<button class="btn red" id="endtest">Testversion beenden und Daten löschen</button>`:`<button class="btn sec" id="logout">Abmelden</button><button class="btn red" id="wipe">Konto und alle Daten löschen</button>`}
+      <p class="foot">Calmius · Testversion 1.0</p>`; }
+};
+
+/* ===== „Für mich“: Wirkung, Zeitpunkte, Protokoll ===== */
+function myList(){ const res={hoch:[],mittel:[],niedrig:[]}, m=new Map();
+  nach().forEach(p=>{ const k=ctxTier(p)+"|"+p.id; if(!m.has(k)) m.set(k,{tier:ctxTier(p),s:byId(p.id),n:0,ja:0,etwas:0,nein:0,d:[]}); const o=m.get(k); if(!o.s) return; o.n++; o[p.helped]++; if(p.v1!=null) o.d.push(drop(p)); });
+  [...m.values()].filter(o=>o.s).forEach(o=>{ o.drop=avg(o.d); o.good=(o.ja+o.etwas)>=o.nein&&(o.ja*2+o.etwas-o.nein*2)/o.n>0; res[o.tier].push(o); });
+  Object.values(res).forEach(l=>l.sort((a,b)=>(b.good-a.good)||((b.ja*2+b.etwas)-(a.ja*2+a.etwas))||(b.drop||0)-(a.drop||0)));
+  return res; }
+function printHTML(){ const L=myList(), a=S.account, today=new Date().toLocaleDateString("de-DE"), p=S.plan;
+  const tbl=l=>`<table><tr><th>Skill</th><th>Bereich</th><th>genutzt</th><th>geholfen</th></tr>${l.map(o=>`<tr><td><b>${esc(o.s.t)}</b><br><small>${esc(o.s.s)}</small></td><td>${AREAS[o.s.area].label}</td><td>${o.n}×</td><td>${o.ja+o.etwas}×</td></tr>`).join("")}</table>`;
+  const sec=t=>{ const g=L[t].filter(o=>o.good), b=L[t].filter(o=>!o.good); return `<h2>${TIERS[t].label} (${TIERS[t].range})</h2>${g.length?`<h3>✓ Hilft mir</h3>${tbl(g)}`:"<p class='m'>Noch keine hilfreichen Skills bewertet.</p>"}${b.length?`<h3>✗ Hilft mir eher nicht</h3>${tbl(b)}`:""}`; };
+  const txt=v=>esc(v||"–").replace(/\n/g,"<br>");
+  return `<!DOCTYPE html><html lang="de"><head><meta charset="utf-8"><title>Meine Skill-Liste – ${esc(a.name)}</title><style>
+    body{font:12pt/1.45 Arial,Helvetica,sans-serif;color:#111;max-width:760px;margin:24px auto;padding:0 18px}h1{font-size:20pt;margin:0}h2{font-size:14pt;margin:22px 0 6px;border-bottom:2px solid #111;padding-bottom:3px}h3{font-size:11.5pt;margin:12px 0 4px}
+    table{width:100%;border-collapse:collapse;font-size:10.5pt}th,td{border:1px solid #bbb;padding:5px 7px;text-align:left;vertical-align:top}th{background:#eee}small{color:#555}.m{color:#555}.box{border:1px solid #bbb;padding:8px 10px;margin:6px 0}
+    @media print{body{margin:0}h2{break-after:avoid}tr{break-inside:avoid}}</style></head><body onload="setTimeout(()=>window.print(),300)">
+    <h1>Meine persönliche Skill-Liste</h1><p>${esc(a.name)} · Stand ${today}</p>
+    <h2>Meine Notfall-Skills</h2><ol>${notfallSkills().map(sk=>`<li><b>${esc(sk.t)}</b> – ${esc(sk.steps.join(" "))}</li>`).join("")}</ol>
+    ${["hoch","mittel","niedrig"].map(sec).join("")}
+    ${helpedItems().length?`<h2>Hilfsmittel, die mir helfen</h2><ul>${helpedItems().map(x=>`<li><b>${esc(x.it.t)}</b> – ${esc(x.it.d)} (bei: ${esc(x.via.join(", "))})</li>`).join("")}</ul>`:""}
+    <h2>Mein Notfallplan</h2><div class="box"><b>Frühwarnzeichen:</b><br>${txt(p.warn)}</div><div class="box"><b>Menschen, die ich ansprechen kann:</b><br>${txt(p.people)}</div><div class="box"><b>Was mir wichtig ist:</b><br>${txt(p.reasons)}</div>
+    <p class="m" style="margin-top:20px">Erstellt mit Calmius. Wenn es zu viel wird: Sprich jederzeit die Pflege an.</p></body></html>`; }
+const FM={
+  liste(){ const L=myList(), any=Object.values(L).some(l=>l.length);
+    const item=o=>`<button class="skill mini" data-id="${o.s.id}"><span class="tag">${AREAS[o.s.area].icon} ${AREAS[o.s.area].label}</span><b>${esc(o.s.t)}</b><span class="s">${o.n}× genutzt · ${o.ja+o.etwas}× geholfen</span></button>`;
+    const top=Object.values(L).flat().filter(o=>o.good).reduce((m,o)=>{ const x=m.get(o.s.id)||{s:o.s,n:0,ok:0}; x.n+=o.n; x.ok+=o.ja+o.etwas; m.set(o.s.id,x); return m; },new Map());
+    const best=[...top.values()].sort((a,b)=>b.ok-a.ok||a.n-b.n).slice(0,3);
+    return `${best.length?`<h2>Am wirksamsten</h2>${best.map(x=>`<button class="skill mini" data-id="${x.s.id}"><span class="tag">${AREAS[x.s.area].icon} ${AREAS[x.s.area].label}</span><b>${esc(x.s.t)}</b><span class="s">${x.ok}× geholfen</span></button>`).join("")}`:""}
+      ${(()=>{ const hi=helpedItems(), rest=ITEMS.filter(it=>!hi.some(x=>x.it.id===it.id)).slice(0,cur.more.includes("shop")?99:5);
+        return `<h2>🛒 Meine Hilfsmittel</h2><div class="card shop">${hi.length?hi.map(x=>itemCard(x.it,"Hat geholfen bei: "+x.via.slice(0,2).join(", "))).join(""):`<p class="muted">Sobald ein Skill mit Hilfsmittel hilft, erscheint es hier mit Link.</p>`}${shopNote}</div>
+        <p class="sec-t">Weitere Ideen</p><div class="card" style="margin-top:0">${rest.map(it=>itemCard(it)).join("")}<button class="link" data-more="shop">${cur.more.includes("shop")?"Weniger anzeigen":"Alle Hilfsmittel anzeigen"}</button></div>`; })()}
+      <p class="muted" style="margin-top:14px">Deine Bewertungen, getrennt nach Spannungsstufe.</p>
+      ${!any?`<p class="muted">Noch keine Bewertungen. Nach jedem Skill fragt die App, ob er geholfen hat – daraus entsteht deine Liste.</p>`:
+      ["hoch","mittel","niedrig"].map(t=>{ const g=L[t].filter(o=>o.good), b=L[t].filter(o=>!o.good);
+        return `<h2><span class="zone ${TIERS[t].cls}">${TIERS[t].range}</span> ${TIERS[t].label}</h2>
+          <p class="sec-t" style="margin-top:6px">✓ Hilft mir · ${g.length}</p>${g.length?(cur.more.includes(t)?g:g.slice(0,5)).map(item).join("")+(g.length>5?`<button class="link" data-more="${t}">${cur.more.includes(t)?"Weniger anzeigen":"Alle "+g.length+" anzeigen"}</button>`:""):`<p class="muted">Noch nichts bewertet.</p>`}
+          ${b.length?`<p class="sec-t">✗ Hilft mir eher nicht · ${b.length}</p>${(cur.more.includes(t+"b")?b:b.slice(0,3)).map(item).join("")}${b.length>3?`<button class="link" data-more="${t}b">${cur.more.includes(t+"b")?"Weniger anzeigen":"Alle "+b.length+" anzeigen"}</button>`:""}`:""}`; }).join("")}
+      ${any?`<button class="btn" id="dl">Liste herunterladen und drucken</button><button class="btn sec" id="cplist">Liste als Text kopieren</button>`:""}`; },
+  wirkung(){ const okc={}; nach().forEach(p=>{ const sk=byId(p.id); if(sk&&p.helped!=="nein") okc[sk.area]=(okc[sk.area]||0)+1; }); const ranked=Object.entries(okc).sort((a,b)=>b[1]-a[1]), max=Math.max(1,...ranked.map(([,n])=>n));
+    const top=[...new Set(nach().map(p=>p.id))].map(id=>({s:byId(id),sc:score(id),n:nach().filter(p=>p.id===id).length})).filter(x=>x.s&&x.sc>0.5).sort((a,b)=>b.sc-a.sc).slice(0,6);
+    const own=S.plan.skills.split("\n").map(s=>s.trim()).filter(Boolean), tr=(S.account.triggers||[]).filter(k=>TRIGGERS[k]);
+    return `<h2>Diese Kategorien helfen dir</h2><div class="card">${ranked.length?bars(ranked.map(([k,n])=>[`${AREAS[k].icon} ${AREAS[k].label}`,n,"var(--green)",n+"×"]),max):`<p class="muted">Noch keine Bewertungen.</p>`}
+        <p class="muted" style="margin-top:8px">So oft hat ein Skill aus diesem Bereich geholfen.</p></div>
+      <h2>Meine persönlichen Skills</h2>${top.length?top.map(x=>skillBtn({s:x.s,why:`${x.n}× genutzt`})).join(""):`<p class="muted">Sobald du Skills bewertest, erscheinen hier die, die dir helfen.</p>`}
+      ${own.length?`<h3>Selbst eingetragen</h3><div class="chips">${own.map(o=>`<span class="chip">${esc(o)}</span>`).join("")}</div>`:""}
+      ${tr.length?`<h2>Passend zu meinen Auslösern</h2>`+tr.slice(0,4).map(k=>{ const s=areaList(TRIGGERS[k].c[0],"mittel",[],k)[0]; return s?skillBtn({s,why:`Bei „${TRIGGERS[k].l}“`}):""; }).join(""):""}`; },
+  wann(){ const rk={hoch:2,mittel:1,niedrig:0}, checks=S.points.filter(p=>p.ctx==="check").slice().sort((a,b)=>sev(b)-sev(a)).slice(0,4);
+    const after=c=>nach().filter(p=>p.t>c.t&&p.t-c.t<3*3600e3).sort((a,b)=>a.t-b.t);
+    const B=[["Morgens",6,11],["Mittags",11,15],["Nachmittags",15,19],["Abends",19,23],["Nachts",23,6]];
+    const inB=(h,[,f,t])=>f<t?h>=f&&h<t:(h>=f||h<t);
+    const rows=B.map(b=>{ const ps=S.points.filter(p=>inB(new Date(p.t).getHours(),b)); const pa=ps.map(p=>val(p,"a")).filter(v=>v!=null); return [b[0],pa.length?Math.max(...pa):null]; });
+    const tcl=trigCounts();
+    return `<h2>Wann war es am schwersten?</h2>${checks.map(c=>{ const af=after(c), good=af.filter(p=>p.helped!=="nein");
+        return `<div class="card peak"><div class="row"><b>${fmtTime(c.t)}</b></div>
+          <p class="muted">${valsText(c)}${c.prob&&c.prob.length?` · ${esc(c.prob.join(", "))}`:""}${c.trig?` · <span class="trig">⚡ ${esc(trigLabel(c.trig))}</span>`:""}</p>
+          <p style="margin-top:8px"><b>Was geholfen hat:</b> ${good.length?good.map(p=>`${esc(p.skill)} ${HELP[p.helped].i}`).join(", "):"<span class='muted'>nichts eingetragen</span>"}</p>
+          ${af.length?`<p class="muted">Danach: ${MODES[af[af.length-1].mode].label} ${af[af.length-1].v}</p>`:""}</div>`; }).join("")}
+      <h2>Höchste Anspannung nach Tageszeit</h2><div class="card">${bars(rows.map(([l,v])=>[l,v,null,v==null?"–":v]))}</div>
+      ${probCounts().length?`<h2>Häufigste weitere Probleme</h2><div class="card">${bars(probCounts().slice(0,8).map(o=>[esc(o.t),o.n,"var(--violet)",o.n+"×"]),probCounts()[0].n)}</div>`:""}
+      ${tcl.length?`<h2>Häufigste Auslöser</h2><div class="card">${bars(tcl.slice(0,8).map(o=>[esc(trigLabel(o.t)),o.n,"var(--orange)",o.n+"×"]),tcl[0].n)}</div>`:""}`; },
+  protokoll(){ const r=cur.range, ps=inRange(r), st=stats(ps);
+    const kpi=(l,v,t)=>`<div class="kpi"><span>${l}</span><b style="color:${v==null?"var(--muted)":color(v)}">${v==null?"–":v}</b><small>${t?fmtShort(t):"keine Angabe"}</small></div>`;
+    const groups=groupBy(ps,r>7?"week":"day");
+    return `<div class="phead"><div class="row"><b>Spannungsprotokoll · ${esc(nameOf())}</b></div><p class="muted">${periodLabel(r)}</p></div>
+      <div class="rng">${[[1,"Heute"],[3,"3 Tage"],[7,"7 Tage"],[30,"30 Tage"],[180,"180 Tage"]].map(([v,l])=>`<button class="${r===v?"on":""}" data-rng="${v}">${l}</button>`).join("")}</div>
+      ${!ps.length?`<p class="muted">Keine Einträge in diesem Zeitraum.</p>`:`
+      <p class="sec-t">1 · Höchstwerte</p>
+      <div class="kpis">${kpi("Anspannung",st.amax,st.amaxT)}${kpi("Selbstverletzungs&shy;druck",st.svmax,st.svmaxT)}${kpi("Suizid&shy;gedanken",st.suimax,st.suimaxT)}</div>
+      <p class="sec-t">2 · Verlauf</p>
+      <div class="card" style="margin-top:0">${chart(r,ps)}<div class="legend"><span><i style="background:var(--accent)"></i>Anspannung</span><span><i style="background:var(--orange)"></i>Selbstverletzungsdruck</span><span><i style="background:var(--violet)"></i>Suizidgedanken</span>${r>7?`<span>Punkte = höchster Wert ${r>30?"der Woche":"des Tages"}</span>`:""}</div></div>
+      <p class="sec-t">3 · ${r>7?"Wochen":"Tage"} – Höchstwerte <span>antippen</span></p>
+      <div class="card" style="padding:8px 10px;margin-top:0">${hdRow(r>7?"Woche":"Tag")}${groups.map(g=>groupRow(g,r>7)).join("")}</div>
+      ${trigCounts(ps).length?`<p class="sec-t">4 · Häufigste Auslöser</p><div class="card" style="margin-top:0">${bars(trigCounts(ps).slice(0,5).map(o=>[esc(trigLabel(o.t)),o.n,"var(--orange)",o.n+"×"]),trigCounts(ps)[0].n)}</div>`:""}
+      <button class="btn sec" id="copy">Protokoll als Text kopieren</button>`}`; }
+};
+const DAY=864e5;
+function rangeStart(r){ const d=new Date(); d.setHours(0,0,0,0); return d.getTime()-(r-1)*DAY; }
+const inRange=r=>S.points.filter(p=>p.t>=rangeStart(r));
+const avg=a=>{ a=a.filter(v=>v!=null); return a.length?a.reduce((x,y)=>x+y,0)/a.length:null; };
+const fmt=v=>v==null?"–":v.toFixed(1).replace(".",",");
+const fmtShort=t=>new Date(t).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+const dstr=t=>new Date(t).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"});
+function periodLabel(r){ return r===1?`Heute, ${dstr(Date.now())}`:`${dstr(rangeStart(r))} bis ${dstr(Date.now())} · letzte ${r} Tage`; }
+function stats(ps){ const top=arr=>{ let v=null,t=null; arr.forEach(([x,tt])=>{ if(v==null||x>v){ v=x; t=tt; } }); return [v,t]; };
+  const f=m=>ps.filter(p=>val(p,m)!=null).map(p=>[val(p,m),p.t]); const [amax,amaxT]=top(f("a")), [svmax,svmaxT]=top(f("sv")), [suimax,suimaxT]=top(f("sui"));
+  const n=ps.filter(p=>p.ctx==="nach");
+  return {amax,amaxT,svmax,svmaxT,suimax,suimaxT,high:ps.filter(p=>p.ctx==="check"&&Object.keys(MODES).some(m=>val(p,m)!=null&&tierOf(m,val(p,m))==="hoch")).length,skills:n.length,ok:n.filter(p=>p.helped!=="nein").length}; }
+function isoWeek(t){ const d=new Date(t); d.setHours(0,0,0,0); d.setDate(d.getDate()+3-((d.getDay()+6)%7)); const w1=new Date(d.getFullYear(),0,4); return 1+Math.round(((d-w1)/DAY-3+((w1.getDay()+6)%7))/7); }
+function groupBy(ps,kind){ const m=new Map();
+  ps.forEach(p=>{ const d=new Date(p.t); d.setHours(0,0,0,0); let k,lab;
+    if(kind==="week"){ const mon=new Date(d); mon.setDate(d.getDate()-((d.getDay()+6)%7)); k="w"+mon.getTime(); lab=`KW ${isoWeek(p.t)}`; m.has(k)||m.set(k,{k,lab,sub:`${dstr(mon)}–${dstr(mon.getTime()+6*DAY)}`,ps:[],kind}); }
+    else { k="d"+d.getTime(); lab=d.toLocaleDateString("de-DE",{weekday:"short",day:"2-digit",month:"2-digit"}); m.has(k)||m.set(k,{k,lab,ps:[],kind}); }
+    m.get(k).ps.push(p); });
+  return [...m.values()]; }
+const hdRow=l=>`<div class="drow hd"><span>${l}</span><span class="n" style="font-size:12px;font-weight:600">An&shy;spannung</span><span class="n" style="font-size:12px;font-weight:600">Druck</span><span class="n" style="font-size:12px;font-weight:600">Suizid&shy;gedanken</span><span></span></div>`;
+function groupRow(g,isWeek){ const st=stats(g.ps), open=cur.open.includes(g.k), c=v=>v==null?"":`style="color:${color(v)}"`;
+  const sub=g.sub?g.sub+" · ":"", body=!open?"":isWeek?`<div class="dbody">${groupBy(g.ps,"day").map(x=>groupRow(x,false)).join("")}</div>`
+    :`<div class="dbody">${g.ps.map(p=>`<div class="prow"><span class="t">${new Date(p.t).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}</span>${p.ctx==="nach"?`nach <b>${esc(p.skill)}</b> · ${HELP[p.helped].i} ${HELP[p.helped].l}`:"Einschätzung"}${p.trig?` · <span class="trig">⚡ ${esc(trigLabel(p.trig))}</span>`:""}
+      <div class="vals">${Object.keys(MODES).filter(m=>val(p,m)!=null).map(m=>`<span>${MODES[m].label.replace("Selbstverletzungsdruck","Druck")} <b style="color:${color(val(p,m))}">${val(p,m)}</b></span>`).join("")}</div>${p.prob&&p.prob.length?`<div class="muted" style="font-size:14px">${esc(p.prob.join(", "))}</div>`:""}</div>`).join("")}</div>`;
+  return `<button class="drow ${open?"open":""}" data-open="${g.k}"><span class="lb"><b>${g.lab}</b><small>${sub}${g.ps.length} Eintr${g.ps.length===1?"ag":"äge"}</small></span>
+    <span class="n" ${c(st.amax)}>${st.amax==null?"–":st.amax}</span><span class="n" ${c(st.svmax)}>${st.svmax==null?"–":st.svmax}</span><span class="n" ${c(st.suimax)}>${st.suimax==null?"–":st.suimax}</span><span class="chev">›</span></button>${body}`; }
+function chart(r,ps){
+  const W=360,H=210,L=24,R=8,T=14,B=26, from=rangeStart(r), to=from+r*DAY;
+  const X=t=>L+(t-from)/(to-from)*(W-L-R), Y=v=>T+(10-v)/10*(H-T-B);
+  let pts=ps.slice().sort((a,b)=>a.t-b.t).map(p=>({t:p.t,a:val(p,"a"),sv:val(p,"sv"),su:val(p,"sui")}));
+  if(r>7){ const wk=r>30, mx=a=>a.length?Math.max(...a):null, of=(g,m)=>mx(g.ps.map(p=>val(p,m)).filter(v=>v!=null)); pts=groupBy(ps,wk?"week":"day").map(g=>({t:+g.k.slice(1)+(wk?3.5:.5)*DAY,a:of(g,"a"),sv:of(g,"sv"),su:of(g,"sui")})).sort((a,b)=>a.t-b.t); }
+  const rad=r>30?2:3.5, sw=r>30?1.8:2.5;
+  const line=(k,c)=>{ const a=pts.filter(p=>p[k]!=null); return a.length?`<polyline fill="none" stroke="${c}" stroke-width="${sw}" stroke-linejoin="round" points="${a.map(p=>X(p.t)+","+Y(p[k])).join(" ")}"/>`+a.map(p=>`<circle cx="${X(p.t)}" cy="${Y(p[k])}" r="${rad}" fill="${c}"/>`).join(""):""; };
+  let g=""; [0,5,10].forEach(v=>g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#2f3540"/><text x="${L-6}" y="${Y(v)+4}" fill="#9aa3b2" font-size="12" text-anchor="end">${v}</text>`);
+  g+=`<line x1="${L}" x2="${W-R}" y1="${Y(7)}" y2="${Y(7)}" stroke="#d0706a" stroke-dasharray="4 4" opacity=".55"/><text x="${W-R}" y="${Y(7)-4}" fill="#d0706a" font-size="12" text-anchor="end">Hochspannung</text>`;
+  const tick=(t,txt)=>g+=`<line x1="${X(t)}" x2="${X(t)}" y1="${T}" y2="${H-B}" stroke="#262b33"/><text x="${X(t)}" y="${H-7}" fill="#9aa3b2" font-size="12" text-anchor="middle">${txt}</text>`;
+  if(r===1) [6,12,18].forEach(h=>tick(from+h*3600e3,h+" Uhr"));
+  else if(r<=7) for(let i=0;i<r;i++) tick(from+i*DAY+DAY/2,new Date(from+i*DAY).toLocaleDateString("de-DE",{weekday:"short"}));
+  else if(r===30) for(let i=2;i<30;i+=7) tick(from+i*DAY,dstr(from+i*DAY));
+  else for(let i=15;i<180;i+=30) tick(from+i*DAY,new Date(from+i*DAY).toLocaleDateString("de-DE",{month:"short"}));
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Verlauf ${periodLabel(r)}">${g}${line("a","var(--accent)")}${line("sv","var(--orange)")}${line("su","var(--violet)")}</svg>`;
+}
+function exportText(r){ const ps=inRange(r), st=stats(ps), L=[], m=(v,t)=>v==null?"–":v+(t?" ("+fmtShort(t)+")":"");
+  L.push(`Spannungsprotokoll – ${nameOf()} – ${periodLabel(r)}`,"","Höchstwerte:",`  Anspannung ${m(st.amax,st.amaxT)}`,`  Selbstverletzungsdruck ${m(st.svmax,st.svmaxT)}`,`  Suizidgedanken ${m(st.suimax,st.suimaxT)}`,"");
+  const tc=trigCounts(ps); if(tc.length) L.push("Häufigste Auslöser: "+tc.slice(0,5).map(o=>trigLabel(o.t)+" ("+o.n+"×)").join(", "),"");
+  groupBy(ps,"day").forEach(g=>{ const s2=stats(g.ps); L.push(`${g.lab}: Anspannung max ${s2.amax==null?"–":s2.amax}, Druck max ${s2.svmax==null?"–":s2.svmax}, Suizidgedanken max ${s2.suimax==null?"–":s2.suimax}`);
+    g.ps.slice().reverse().forEach(p=>L.push(`   ${new Date(p.t).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}  ${valsText(p)}${p.prob&&p.prob.length?", Probleme: "+p.prob.join(", "):""}${p.trig?", Auslöser: "+trigLabel(p.trig):""}${p.ctx==="nach"?", nach "+p.skill+" (geholfen: "+HELP[p.helped].l+")":""}`)); });
+  return L.join("\n"); }
+
+/* ===== Steuerung ===== */
+let view="start", skillFrom="start";
+const OUT=["welcome","register","login","sosAge","sos","how"];
+const NAVMAP={start:"start",check:"start",rate:"start",hilfe:"start",eval:"start",rate2:"start",ergebnis:"start",skills:"skills",fuermich:"fuermich",plan:"plan",profil:"profil",triggers:"profil"};
+let HIST=[];
+const ROOTS=["start","skills","fuermich","plan","profil","welcome"];
+function go(v,keep,back){ stopTimer(); if(!back&&!keep&&view!==v) HIST.push(view); if(v==="ergebnis") HIST=["start"]; if(v==="start"||v==="welcome") HIST=[];
+  view=v; const showBack=HIST.length&&!(ROOTS.includes(v)&&!["fuermich","plan"].includes(v)&&HIST.length===0);
+  $("#app").innerHTML=(HIST.length&&v!=="start"&&v!=="welcome"?`<button class="back" id="back">‹ Zurück</button>`:"")+V[v](); if(!keep) window.scrollTo(0,0);
+  document.body.classList.toggle("out",OUT.includes(v)||(v==="skill"&&cur.sos)||(v==="triggers"&&cur.trigFrom!=="profil"));
+  const nv=v==="skill"?skillFrom:NAVMAP[v]; document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===nv)); bind(); }
+function openSkill(id,from){ cur.skill=byId(id); skillFrom=from; if(cur.skill.plan) return go("plan"); go("skill"); }
+const err=t=>{ $("#err").textContent=t; };
+const ageOk=v=>{ const n=parseInt(v,10); return n>=12&&n<=110?n:null; };
+function bind(){
+  if(view==="start"&&S.account&&S.loggedIn) setTimeout(dailyGreeting,250);
+  if($("#back")) $("#back").onclick=()=>{ const v=HIST.pop()||"start"; if(v==="sos"||v==="sosAge"||v==="welcome") cur.sos=v!=="welcome"; go(v,false,true); };
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+  document.querySelectorAll(".skill").forEach(b=>b.onclick=()=>{ const flow=view==="hilfe"||view==="ergebnis";
+    if(!flow){ cur.before=null; cur.v=null; cur.vals=null; cur.trig=null; cur.tried=[]; } openSkill(b.dataset.id, cur.sos?"sos":flow||view==="start"?"start":view); });
+  if($("#sos")) $("#sos").onclick=()=>{ cur.sos=true; cur.off=0; go("sosAge"); };
+  if($("#more")) $("#more").onclick=()=>{ cur.off++; go(view,true); };
+  if($("#test")) $("#test").onclick=()=>{ S=fresh(); S.account={name:"Testperson",age:35,test:true,triggers:["abend","allein","streit","kritik"],ownTriggers:""}; S.loggedIn=true; S.onboarded=true; S.points=demo(); S.plan.reasons="Meine Familie\nDas Konzert im Sommer"; { const days=[...new Set(S.points.map(p=>dayKey(p.t)))].filter(k=>k!==dayKey(Date.now())); S.rewards={points:days.length,days,today:{}}; } save(); cur.sos=false; go("start"); };
+  if(view==="sosAge"){ const ok=()=>{ const n=ageOk($("#sa").value); if(n==null) return err("Bitte gib dein Alter als Zahl ein."); cur.sosAge=n; go("sos"); };
+    $("#saok").onclick=ok; $("#sa").onkeydown=e=>{ if(e.key==="Enter") ok(); }; $("#sa").focus(); }
+  if(view==="register") $("#reg").onclick=async()=>{
+    const n=$("#r-name").value.trim(), age=ageOk($("#r-age").value), m=$("#r-mail").value.trim().toLowerCase(), p=$("#r-pw").value, p2=$("#r-pw2").value;
+    if(!n) return err("Bitte gib einen Namen ein."); if(age==null) return err("Bitte gib dein Alter ein.");
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m)) return err("Bitte gib eine gültige E-Mail-Adresse ein.");
+    if(p.length<6) return err("Das Passwort braucht mindestens 6 Zeichen."); if(p!==p2) return err("Die Passwörter stimmen nicht überein.");
+    const salt=Math.random().toString(36).slice(2); S=fresh(); S.account={name:n,age,email:m,salt,hash:await hash(p,salt),triggers:[],ownTriggers:""}; S.loggedIn=true; save(); cur.sos=false; cur.trigFrom="how"; go("triggers"); };
+  if(view==="triggers"){ document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{ const t=S.account.triggers=S.account.triggers||[], k=b.dataset.t, i=t.indexOf(k); i<0?t.push(k):t.splice(i,1); b.classList.toggle("on"); save(); });
+    $("#trigok").onclick=()=>{ S.account.ownTriggers=$("#own").value; save(); go(cur.trigFrom); }; }
+  if(view==="login"){ const doLogin=async()=>{ const m=$("#l-mail").value.trim().toLowerCase(), p=$("#l-pw").value, a=S.account;
+      if(!a||m!==a.email||await hash(p,a.salt)!==a.hash) return err("E-Mail oder Passwort stimmt nicht.");
+      S.loggedIn=true; cur.sos=false; save(); go(S.onboarded?"start":"how"); };
+    $("#li").onclick=doLogin; $("#l-pw").onkeydown=e=>{ if(e.key==="Enter") doLogin(); };
+    $("#forgot").onclick=()=>confirmBox("Passwort vergessen?","Dein Konto liegt nur auf diesem Handy, deshalb kann das Passwort nicht zurückgesetzt werden. Du kannst Konto und Daten löschen und neu starten.","Konto löschen und neu starten",wipe); }
+  if(view==="how") $("#howdone").onclick=()=>{ S.onboarded=true; save(); go("start"); };
+  if(view==="start") document.querySelectorAll(".area").forEach(b=>b.onclick=()=>{ cur.openCat=[b.dataset.area]; cur.openTier=[b.dataset.area+"hoch"]; cur.q=""; go("skills"); });
+  if(view==="check"){ cur.lastCheck=null; } if(view==="check") document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{ cur.focus=b.dataset.mode; cur.a=cur.sv=cur.sui=null; cur.prob=[]; cur.trig=null; go("rate"); });
+  if(view==="rate"){ bindTicks(()=>{ $("#go").disabled=!allSet(); });
+    document.querySelectorAll("[data-prob]").forEach(b=>b.onclick=()=>{ const t=b.dataset.prob, i=cur.prob.findIndex(x=>x.toLowerCase()===t.toLowerCase()); i<0?cur.prob.push(t):cur.prob.splice(i,1); b.classList.toggle("on"); });
+    document.querySelectorAll("[data-trig]").forEach(b=>b.onclick=()=>{ const k=b.dataset.trig; cur.trig=cur.trig===k?null:k; $("#trigtxt").value=""; document.querySelectorAll("[data-trig]").forEach(z=>z.classList.toggle("on",z.dataset.trig===cur.trig)); });
+    $("#trigtxt").oninput=e=>{ const t=normTrig(e.target.value); cur.trig=t||null; document.querySelectorAll("[data-trig]").forEach(z=>z.classList.toggle("on",!!t&&trigKey(z.dataset.trig)===trigKey(t))); };
+    $("#go").onclick=()=>{ if(cur.trig) cur.trig=TRIGGERS[cur.trig]?cur.trig:normTrig(cur.trig);
+      const pt=normTrig($("#probtxt").value); if(pt&&!cur.prob.some(x=>x.toLowerCase()===pt.toLowerCase())) cur.prob.push(pt);
+      const all={a:cur.a,sv:cur.sv,sui:cur.sui}; cur.vals=all;
+      cur.mode=MODES[cur.focus]?cur.focus:Object.keys(MODES).sort((x,y)=>(RK[tierOf(y,all[y])]*20+all[y])-(RK[tierOf(x,all[x])]*20+all[x]))[0];
+      cur.v=all[cur.mode]; cur.tier=["hoch","mittel","niedrig"].find(t=>Object.keys(all).some(m=>tierOf(m,all[m])===t)); cur.off=0; cur.tried=[]; cur.before={v:cur.v};
+      const pt0={t:Date.now(),mode:cur.mode,v:cur.v,all,ctx:"check",trig:cur.trig,prob:cur.prob.length?cur.prob.slice():undefined};
+      if(cur.lastCheck&&S.points[0]&&S.points[0].t===cur.lastCheck) S.points[0]=pt0; else S.points.unshift(pt0); cur.lastCheck=pt0.t; save(); go("hilfe"); }; }
+  if(view==="skills"){ document.querySelectorAll("[data-oc]").forEach(b=>b.onclick=()=>{ const k=b.dataset.oc, i=cur.openCat.indexOf(k); i<0?cur.openCat.push(k):cur.openCat.splice(i,1); go("skills",true); });
+    document.querySelectorAll("[data-ot]").forEach(b=>b.onclick=()=>{ const k=b.dataset.ot, i=cur.openTier.indexOf(k); i<0?cur.openTier.push(k):cur.openTier.splice(i,1); go("skills",true); });
+    const q=$("#q"); q.oninput=()=>{ cur.q=q.value; const pos=q.selectionStart; go("skills",true); const n=$("#q"); n.focus(); n.setSelectionRange(pos,pos); }; }
+  if(view==="fuermich"){ document.querySelectorAll("[data-fm]").forEach(b=>b.onclick=()=>{ cur.fm=b.dataset.fm; go("fuermich",true); });
+    document.querySelectorAll("[data-rng]").forEach(b=>b.onclick=()=>{ cur.range=+b.dataset.rng; cur.open=[]; go("fuermich",true); });
+    document.querySelectorAll("[data-open]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.open, i=cur.open.indexOf(k); i<0?cur.open.push(k):cur.open.splice(i,1); go("fuermich",true); });
+    document.querySelectorAll("[data-more]").forEach(b=>b.onclick=()=>{ const k=b.dataset.more, i=cur.more.indexOf(k); i<0?cur.more.push(k):cur.more.splice(i,1); go("fuermich",true); });
+    if($("#dl")) $("#dl").onclick=async()=>{ const fn=`Meine Skill-Liste ${S.account.name}.html`, html=printHTML();
+      if(window.claude&&claude.use){ try{ const d=await claude.use("downloads"); if(!d) throw {code:"unavailable"}; await d.save({filename:fn,data:html}); toast("Gespeichert – Datei öffnen zum Drucken"); return; }
+        catch(e){ if(e&&e.code==="declined") return; } }
+      try{ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([html],{type:"text/html"})); a.download=fn; document.body.appendChild(a); a.click(); a.remove(); toast("Gespeichert – Datei öffnen zum Drucken"); }
+      catch(e){ toast("Herunterladen nicht möglich – bitte kopieren"); } };
+    if($("#cplist")) $("#cplist").onclick=()=>{ const L=myList(), out=["Meine Skill-Liste – "+nameOf()+" – Stand "+new Date().toLocaleDateString("de-DE")];
+      ["hoch","mittel","niedrig"].forEach(t=>{ out.push("",TIERS[t].label+" ("+TIERS[t].range+")"); L[t].forEach(o=>out.push(`  ${o.good?"✓":"✗"} ${o.s.t} (${AREAS[o.s.area].label}) – ${o.n}× genutzt, ${o.ja+o.etwas}× geholfen`)); });
+      try{ navigator.clipboard.writeText(out.join("\n")).then(()=>toast("Kopiert"),()=>toast("Kopieren nicht möglich")); }catch(e){ toast("Kopieren nicht möglich"); } };
+    if($("#copy")) $("#copy").onclick=()=>{ const txt=exportText(cur.range);
+      try{ navigator.clipboard.writeText(txt).then(()=>toast("Kopiert"),()=>toast("Kopieren nicht möglich")); }catch(e){ toast("Kopieren nicht möglich"); } }; }
+  if(view==="skill"){ $("#start").onclick=startTimer; $("#done").onclick=()=>{ if(cur.sos) return go("sos"); go("eval"); }; }
+  if(view==="eval") document.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{ cur.helped=b.dataset.h; cur.v=cur.before?cur.before.v:null; go("rate2"); });
+  if(view==="rate2"){ bindTicks(()=>{ $("#saveAfter").disabled=!ready(); }); document.querySelectorAll("[data-m2]").forEach(b=>b.onclick=()=>{ cur.mode=b.dataset.m2; go("rate2",true); });
+    $("#saveAfter").onclick=()=>{ const b=cur.before||{v:null};
+      S.points.unshift({t:Date.now(),mode:cur.mode,v:cur.v,ctx:"nach",id:cur.skill.id,skill:cur.skill.t,v1:b.v,helped:cur.helped,trig:cur.trig,ctxTier:tierOf(cur.mode,b.v!=null?b.v:cur.v)});
+      S.points=S.points.slice(0,3000); save(); if(addPoint("skill")) toast("+1 Lichtpunkt ✨"); cur.tried.push(cur.skill.id); cur.before={v:cur.v}; cur.off=0; go("ergebnis"); }; }
+  if(view==="plan") [["warn","p-warn"],["skills","p-skills"],["people","p-people"],["reasons","p-reasons"]].forEach(([k,id])=>{ $("#"+id).oninput=e=>{ S.plan[k]=e.target.value; save(); }; });
+  if(view==="profil"){
+    $("#pn").oninput=e=>{ const v=e.target.value.trim(); if(v){ S.account.name=v; save(); } };
+    $("#pa").onchange=e=>{ const n=ageOk(e.target.value); if(n==null) return toast("Bitte ein Alter zwischen 12 und 110 eingeben"); S.account.age=n; save(); toast(n>=SENIOR?"Gespeichert – intensive Übungen ausgeblendet":"Alter gespeichert"); };
+    $("#edtrig").onclick=()=>{ cur.trigFrom="profil"; go("triggers"); };
+    $("#spsave").onclick=()=>{ const u=$("#sp").value.trim(); if(u&&!validSpotify(u)){ $("#sperr").textContent="Bitte einen Spotify-Link einfügen (beginnt mit https://open.spotify.com/)."; return; } S.spotify=u; save(); toast(u?"Playlist verbunden":"Spotify getrennt"); go("profil"); };
+    $("#intro").onclick=()=>go("how");
+    if($("#logout")) $("#logout").onclick=()=>{ S.loggedIn=false; save(); go("welcome"); };
+    if($("#wipe")) $("#wipe").onclick=()=>confirmBox("Wirklich alles löschen?","Konto, Notfallplan und Protokoll sind danach weg.","Ja, alles löschen",wipe);
+    if($("#endtest")) $("#endtest").onclick=()=>confirmBox("Testversion beenden?","Alle Testdaten werden gelöscht.","Ja, beenden",wipe); }
+}
+function startTimer(){ stopTimer(); let left=cur.skill.min*60,phase=0,pt=0; const tm=$("#tm"),br=$("#br"); $("#start").textContent="Läuft …";
+  const tick=()=>{ tm.textContent=Math.floor(left/60)+":"+String(left%60).padStart(2,"0");
+    if(br){ const len=phase===0?4:6; if(pt===0){ br.textContent=phase===0?"ein":"aus"; br.style.transitionDuration=len+"s"; br.style.transform=phase===0?"scale(1.3)":"scale(0.85)"; } pt++; if(pt>=len){ pt=0; phase=1-phase; } }
+    if(left<=0){ stopTimer(); tm.textContent="Geschafft"; $("#start").textContent="Nochmal"; if(!cur.sos) setTimeout(()=>{ if(view==="skill") go("eval"); },1200); return; } left--; };
+  tick(); timerId=setInterval(tick,1000); }
+function confirmBox(title,text,yes,fn){ const o=document.createElement("div"); o.className="overlay";
+  o.innerHTML=`<div class="card"><h2 style="margin-top:0">${title}</h2><p>${text}</p><button class="btn red" id="y">${yes}</button><button class="btn sec" id="n">Abbrechen</button></div>`;
+  document.body.appendChild(o); o.querySelector("#n").onclick=()=>o.remove(); o.querySelector("#y").onclick=()=>{ o.remove(); fn(); }; }
+function wipe(){ try{localStorage.removeItem(KEY);}catch(e){} mem=null; S=load(); cur.v=null; cur.sos=false; toast("Alles gelöscht"); go("welcome"); }
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{ cur.sos=false; HIST=[]; go(b.dataset.v,false,true); });
+if("serviceWorker" in navigator&&location.protocol==="https:"&&!/claude\.ai|claudeusercontent/.test(location.host)){ try{ navigator.serviceWorker.register("sw.js").catch(()=>{}); }catch(e){} }
+go(S.account&&S.loggedIn?(S.onboarded?"start":"how"):"welcome");
+</script>
+</body>
+</html>
