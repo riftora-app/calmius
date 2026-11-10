@@ -80,6 +80,10 @@ nav svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8}
 .duo{display:flex;gap:10px;margin-top:22px}.duo .btn{flex:1;margin:0;font-size:15px;padding:12px 8px}
 .btn.install{background:transparent;color:var(--accent);border:2px solid var(--accent)}
 .link.small{font-size:14px;margin-top:6px}
+.btn.ok{background:#5fc28a;color:#0d1f15}
+a.btn{display:block;text-align:center;text-decoration:none;box-sizing:border-box}
+.kpis{display:flex;gap:10px;margin:14px 0}.kpis div{flex:1;background:var(--card2);border-radius:14px;padding:12px;text-align:center}.kpis b{display:block;font-size:26px}.kpis span{font-size:13px;color:var(--muted)}
+.bar{display:grid;grid-template-columns:96px 1fr 40px;gap:8px;align-items:center;margin:6px 0;font-size:14px}.bar i{display:block;height:12px;border-radius:6px;background:var(--accent);min-width:2px}.bar b{text-align:right}
 .codebox{font:700 28px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;text-align:center;background:var(--card2);border:2px dashed var(--accent);border-radius:14px;padding:18px 10px;margin:16px 0;user-select:all}
 .check{display:flex;gap:10px;align-items:center;font-size:16px;margin:14px 0}.check input{width:22px;height:22px;margin:0}
 .logo{font-size:44px;margin:30px 0 8px}
@@ -179,18 +183,29 @@ function randSalt(){ return [...rnd(16)].map(x=>x.toString(16).padStart(2,"0")).
 const CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function normCode(s){ return (s||"").toUpperCase().replace(/[^A-Z0-9]/g,""); }
 async function newRecovery(){ let c=""; for(const b of rnd(12)) c+=CODE_ABC[b%32]; const a=S.account; a.rsalt=randSalt(); a.rhash=await hash(c,a.rsalt); cur.newCode=c.match(/.{4}/g).join("-"); }
+/* ===== Freiwillige anonyme Statistik (nur nach Zustimmung, ohne Kennung) ===== */
+const STATS_URL="";
+const GENDERS=["weiblich","männlich","divers","keine Angabe"];
+function ageGroup(a){ a=+a; return a<18?"12–17":a<=25?"18–25":a<=35?"26–35":a<=50?"36–50":a<=65?"51–65":"66+"; }
+function statsSend(ev){ const a=S.account; if(!STATS_URL||!S.stats||!S.stats.on||!a||a.test||+a.age<16) return;
+  const body=JSON.stringify({ev,ag:ageGroup(a.age),g:a.gender||"keine Angabe"});
+  try{ fetch(STATS_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body,keepalive:true}).catch(()=>{}); }catch(e){} }
+function setStats(on){ S.stats=Object.assign(S.stats||{},{on,at:Date.now()}); if(on&&!S.stats.counted){ statsSend("neu"); S.stats.counted=true; } save(); if(on) statsVisit(); toast(on?"Danke! Anonyme Statistik ist an.":"Es wird nichts gesendet."); }
+function statsVisit(){ if(!S.stats||!S.stats.on||!S.loggedIn) return; const k=dayKey(Date.now()); if(S.stats.day===k) return; S.stats.day=k; save(); statsSend("aufruf"); }
+async function adminFetch(k){ if(!STATS_URL) return null; try{ const r=await fetch(STATS_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({admin:k})}); return await r.json(); }catch(e){ return null; } }
 /* ===== Installieren (PWA) ===== */
 let installEvt=null;
 window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEvt=e; });
 window.addEventListener("appinstalled",()=>{ installEvt=null; if($("#install")) $("#install").remove(); toast("Calmius ist installiert"); });
-function isStandalone(){ try{ return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true; }catch(e){ return false; } }
+const IN_APK=/CalmiusApp/.test(navigator.userAgent);
+function isStandalone(){ if(IN_APK) return true; try{ return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true; }catch(e){ return false; } }
 async function doInstall(){
-  if(installEvt){ installEvt.prompt(); try{ await installEvt.userChoice; }catch(e){} installEvt=null; return; }
-  const inFrame=/claude\.ai|claudeusercontent/.test(location.host);
-  infoBox("App installieren", inFrame?`<p>Öffne Calmius dafür direkt im Browser:</p><p><b>riftora-app.github.io/calmius</b></p>`:
-   `<p><b>Chrome (Android):</b> oben rechts auf ⋮ tippen, dann „App installieren“ oder „Zum Startbildschirm hinzufügen“.</p>
-    <p><b>Samsung Internet:</b> unten auf ≡ tippen, dann „Seite hinzufügen zu“ und „Startbildschirm“.</p>
-    <p><b>iPhone (Safari):</b> auf Teilen tippen, dann „Zum Home-Bildschirm“.</p>`); }
+  const inFrame=/claude\.ai|claudeusercontent/.test(location.host), base=inFrame?"https://riftora-app.github.io/calmius/":"";
+  infoBox("App herunterladen",`<a class="btn" href="${base}calmius.apk" download="Calmius.apk" id="apkdl">⬇️ Calmius-App herunterladen (Android)</a>
+    <p><b>So geht's:</b></p><p>1. Download antippen und warten, bis er fertig ist.<br>2. Die Datei „Calmius.apk“ öffnen.<br>3. Wenn das Handy fragt: „Aus dieser Quelle zulassen“ einschalten, dann „Installieren“.</p>
+    <p class="muted">Calmius erscheint danach mit eigenem Symbol auf dem Startbildschirm und funktioniert ohne Internet. Deine Daten bleiben nur auf dem Handy.</p>
+    ${installEvt?`<button class="btn sec" id="pwainst">Ohne Download als Web-App installieren</button>`:""}`);
+  const pb=document.getElementById("pwainst"); if(pb) pb.onclick=async()=>{ pb.closest(".overlay").remove(); installEvt.prompt(); try{ await installEvt.userChoice; }catch(e){} installEvt=null; }; }
 function infoBox(title,html){ const o=document.createElement("div"); o.className="overlay";
   o.innerHTML=`<div class="card" role="dialog" aria-modal="true"><h2 style="margin-top:0">${title}</h2>${html}<button class="btn" id="ibok">Verstanden</button></div>`;
   document.body.appendChild(o); o.querySelector("#ibok").onclick=()=>o.remove(); }
@@ -404,7 +419,7 @@ function demo(){ const pts=[], now=Date.now(), H=3600e3; let seed=7; const rnd=(
 /* ===== Ansichten ===== */
 const V={
   welcome(){ const has=S.account&&!S.account.test; return `<img class="logoimg" src="icon-192.png" alt=""><div class="brand">Calmius</div><p>Deine Skills für Anspannung, Druck und einen stabilen Alltag – immer dabei.</p>
-      ${isStandalone()?"":`<button class="btn install" id="install">📲 App installieren</button>`}
+      ${isStandalone()?"":`<button class="btn install" id="install">📲 App herunterladen</button>`}
       ${has?`<button class="btn" data-go="login">Anmelden</button>`:""}
       <button class="btn red" id="sos">Sofort-Hilfe ohne Anmeldung</button>
       <div class="duo"><button class="btn sec" id="newacc">Konto erstellen</button><button class="btn sec" data-go="reset">Passwort vergessen</button></div>
@@ -428,12 +443,33 @@ const V={
       <div class="card"><h2 style="margin-top:0">Kurz gesagt</h2><p>Alles, was du in Calmius eingibst, bleibt nur auf diesem Handy. Es gibt keinen Server, kein Tracking, keine Cookies, keine Werbung und keine Analyse. Niemand außer dir kann deine Einträge sehen – auch nicht die Klinik oder wer die App bereitstellt.</p></div>
       <div class="card"><h2 style="margin-top:0">Was gespeichert wird</h2><p>Name oder Spitzname, Alter, E-Mail (nur als Anmeldename), deine Werte, Auslöser, genutzte Skills und dein Notfallplan. Passwort und Wiederherstellungscode werden nur als Prüfwert (Hash) gespeichert, nie im Klartext.</p><p>Gespeichert wird im Browser-Speicher dieses Handys. Dieser Speicher und der Offline-Speicher der App sind technisch nötig, damit die App funktioniert, die du nutzen möchtest (§ 25 Abs. 2 Nr. 2 TDDDG). Eine Einwilligung per Cookie-Banner ist dafür nicht nötig.</p></div>
       <div class="card"><h2 style="margin-top:0">Bereitstellung der App</h2><p>Die App-Dateien werden über GitHub Pages (GitHub, Inc., USA) geladen. Dabei verarbeitet GitHub technisch bedingt deine IP-Adresse und Browserdaten, um die Seite auszuliefern und abzusichern. Deine Einträge in der App werden dabei nie übertragen. Mehr dazu: <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">Datenschutzerklärung von GitHub</a>.</p></div>
+      <div class="card"><h2 style="margin-top:0">Freiwillige anonyme Statistik</h2><p>Nur wenn du zustimmst, sendet Calmius beim Öffnen der App: deine Altersgruppe, deine Angabe zum Geschlecht und dass die App an diesem Tag geöffnet wurde. Keine Uhrzeit, kein Name, keine E-Mail, keine Kennung und keine Einträge. Daraus lässt sich nicht erkennen, wer du bist.</p><p>Die Werte gehen an ein Google-Skript (Google Apps Script) und landen in einer Tabelle. Google verarbeitet dabei technisch bedingt deine IP-Adresse; das Skript speichert sie nicht. Wer die App betreut, sieht nur Summen. Die Zustimmung kannst du jederzeit im Profil zurücknehmen, danach wird nichts mehr gesendet. Bereits gesendete Werte lassen sich dir nicht zuordnen und deshalb auch nicht einzeln löschen. Unter 16 Jahren wird nichts gesendet.</p></div>
       <div class="card"><h2 style="margin-top:0">Deine Kontrolle</h2><p>Du kannst jederzeit alles löschen: im Profil unter „Konto und alle Daten löschen“, durch Löschen der Browserdaten oder durch Deinstallieren der App. Danach ist nichts mehr gespeichert.</p><p>Schütze dein Handy mit einer Bildschirmsperre. Wer dein entsperrtes Handy benutzt, könnte sonst auf den Browser-Speicher zugreifen.</p></div>
       <div class="card"><h2 style="margin-top:0">Wofür Calmius gedacht ist</h2><p>Calmius ist eine Sammlung von Selbsthilfe-Übungen (Skills) für den Alltag. Die App stellt keine Diagnose, ersetzt keine Behandlung und ist kein Medizinprodukt. Wenn es dir sehr schlecht geht, sprich mit deinem Behandlungsteam. Im Notfall: 112.</p></div>
-      <p class="foot">Stand: November 2026</p>`; },
+      <p class="foot">Stand: November 2026<br><button class="link small" data-go="admin">Team-Zugang</button></p>`; },
+  stats(){ const a=S.account; return `<h1>Anonyme Statistik</h1><p>Darf Calmius anonym zählen, wie oft die App genutzt wird?</p>
+      <div class="card"><p style="margin-top:0"><b>Gesendet wird nur:</b></p><p>• Altersgruppe: ${esc(ageGroup(a.age))}<br>• Geschlecht: ${esc(a.gender||"keine Angabe")}<br>• dass die App an einem Tag geöffnet wurde</p><p class="muted" style="margin-bottom:0">Kein Name, keine E-Mail, keine Einträge. Niemand kann sehen, dass du es bist. Du kannst das jederzeit im Profil ändern.</p></div>
+      ${a.gender?"":`<label>Geschlecht</label><div class="chips" id="st-g">${GENDERS.map(g=>`<button class="chip" data-g="${g}">${g}</button>`).join("")}</div>`}
+      <button class="btn ok" id="st-yes">🟢 Ja, anonym zählen</button><button class="btn red" id="st-no">🔴 Nein, nichts senden</button>
+      <button class="link small" data-go="datenschutz">Mehr dazu</button>`; },
+  admin(){ const d=cur.adminData;
+    if(!d) return `<h1>Team-Zugang</h1><p class="muted">Nur für das Team. Hier siehst du die anonyme Nutzungsstatistik.</p>
+      <label for="ak">Team-Schlüssel</label><input id="ak" type="password" autocomplete="off">
+      <p class="err" id="err"></p><button class="btn" id="akok">Statistik ansehen</button><button class="link" data-go="${S.loggedIn?"start":"welcome"}">Zurück zur App</button>`;
+    const bars=(o,max)=>Object.entries(o).map(([k,v])=>`<div class="bar"><span>${esc(k)}</span><i style="width:${max?Math.round(v/max*100):0}%"></i><b>${v}</b></div>`).join("");
+    const mx=o=>Math.max(1,...Object.values(o));
+    return `<h1>Nutzungsstatistik</h1><p class="muted">Anonym, Stand ${esc(d.stand||"")}</p>
+      <div class="kpis"><div><b>${d.nutzer}</b><span>Nutzer</span></div><div><b>${d.aufrufe}</b><span>Aufrufe gesamt</span></div><div><b>${d.aufrufe7}</b><span>Aufrufe 7 Tage</span></div></div>
+      <div class="card"><h2 style="margin-top:0">Altersgruppen (Nutzer)</h2>${bars(d.alterNutzer,mx(d.alterNutzer))}</div>
+      <div class="card"><h2 style="margin-top:0">Altersgruppen (Aufrufe)</h2>${bars(d.alterAufrufe,mx(d.alterAufrufe))}</div>
+      <div class="card"><h2 style="margin-top:0">Geschlecht (Nutzer)</h2>${bars(d.gNutzer,mx(d.gNutzer))}</div>
+      <div class="card"><h2 style="margin-top:0">Geschlecht (Aufrufe)</h2>${bars(d.gAufrufe,mx(d.gAufrufe))}</div>
+      <div class="card"><h2 style="margin-top:0">Aufrufe letzte 14 Tage</h2>${bars(d.tage,mx(d.tage))}</div>
+      <button class="btn sec" id="adout">Team-Zugang schließen</button><button class="link" data-go="${S.loggedIn?"start":"welcome"}">Zurück zur App</button>`; },
   register(){ return `<h1>Konto erstellen</h1><p class="muted">Dein Konto wird nur auf diesem Handy gespeichert – kein Server, keine Weitergabe.</p>
       <label for="r-name">Vorname oder Spitzname</label><input id="r-name" maxlength="30" autocomplete="nickname">
       <label for="r-age">Alter</label><input id="r-age" type="number" inputmode="numeric" min="12" max="110" placeholder="z. B. 34">
+      <label>Geschlecht</label><div class="chips" id="r-g">${GENDERS.map(g=>`<button class="chip" data-g="${g}">${g}</button>`).join("")}</div>
       <label for="r-mail">E-Mail</label><input id="r-mail" type="email" autocomplete="email">
       <label for="r-pw">Passwort (mind. 6 Zeichen)</label><input id="r-pw" type="password" autocomplete="new-password">
       <label for="r-pw2">Passwort wiederholen</label><input id="r-pw2" type="password" autocomplete="new-password">
@@ -552,7 +588,7 @@ const V={
         <p class="muted">Füg den Link deiner Playlist ein (in Spotify: Playlist › Teilen › Link kopieren).</p>
         <input id="sp" type="url" placeholder="https://open.spotify.com/playlist/…" value="${esc(S.spotify)}"><p class="err" id="sperr"></p>
         <button class="btn spot" id="spsave">Playlist verbinden</button>${S.spotify?`<a class="btn sec" href="${esc(S.spotify)}" target="_blank" rel="noopener">Playlist testen</a>`:""}</div>
-      <div class="card"><h2 style="margin-top:0">Datenschutz</h2><p>Alles bleibt nur auf diesem Handy. Passwort und Wiederherstellungscode werden nur als Hash gespeichert.</p><button class="btn sec" data-go="datenschutz">Datenschutz & Hinweise</button>${a.test?"":`<button class="btn sec" id="newcode">${a.rhash?"Neuen Wiederherstellungscode erstellen":"Wiederherstellungscode erstellen"}</button>`}</div>
+      <div class="card"><h2 style="margin-top:0">Datenschutz</h2><p>Alles bleibt nur auf diesem Handy. Passwort und Wiederherstellungscode werden nur als Hash gespeichert.</p><button class="btn sec" data-go="datenschutz">Datenschutz & Hinweise</button>${a.test?"":`<button class="btn sec" id="statsset">Anonyme Statistik: ${S.stats&&S.stats.on?"an":"aus"}</button>`}${a.test?"":`<button class="btn sec" id="newcode">${a.rhash?"Neuen Wiederherstellungscode erstellen":"Wiederherstellungscode erstellen"}</button>`}</div>
       <button class="btn sec" id="intro">Einführung noch einmal ansehen</button>
       ${a.test?`<button class="btn red" id="endtest">Testversion beenden und Daten löschen</button>`:`<button class="btn sec" id="logout">Abmelden</button><button class="btn red" id="wipe">Konto und alle Daten löschen</button>`}
       <p class="foot">Calmius · Testversion 1.0</p>`; }
@@ -682,7 +718,7 @@ function exportText(r){ const ps=inRange(r), st=stats(ps), L=[], m=(v,t)=>v==nul
 
 /* ===== Steuerung ===== */
 let view="start", skillFrom="start";
-const OUT=["welcome","register","login","sosAge","sos","how","code","reset","datenschutz"];
+const OUT=["welcome","register","login","sosAge","sos","how","code","reset","datenschutz","stats","admin"];
 const NAVMAP={start:"start",check:"start",rate:"start",hilfe:"start",eval:"start",rate2:"start",ergebnis:"start",skills:"skills",fuermich:"fuermich",plan:"plan",profil:"profil",triggers:"profil"};
 let HIST=[];
 const ROOTS=["start","skills","fuermich","plan","profil","welcome"];
@@ -705,17 +741,27 @@ function bind(){
   if($("#test")) $("#test").onclick=()=>{ S=fresh(); S.account={name:"Testperson",age:35,test:true,triggers:["abend","allein","streit","kritik"],ownTriggers:""}; S.loggedIn=true; S.onboarded=true; S.points=demo(); S.plan.reasons="Meine Familie\nDas Konzert im Sommer"; { const days=[...new Set(S.points.map(p=>dayKey(p.t)))].filter(k=>k!==dayKey(Date.now())); S.rewards={points:days.length,days,today:{}}; } save(); cur.sos=false; go("start"); };
   if(view==="sosAge"){ const ok=()=>{ const n=ageOk($("#sa").value); if(n==null) return err("Bitte gib dein Alter als Zahl ein."); cur.sosAge=n; go("sos"); };
     $("#saok").onclick=ok; $("#sa").onkeydown=e=>{ if(e.key==="Enter") ok(); }; $("#sa").focus(); }
+  if(view==="register"){ cur.regG=null; document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{ cur.regG=b.dataset.g; document.querySelectorAll("[data-g]").forEach(z=>z.classList.toggle("on",z===b)); }); }
+  if(view==="stats"){ const fin=v=>{ setStats(v); const n=cur.statsNext||"profil"; cur.statsNext=null; HIST=[]; go(n,false,true); }; $("#st-yes").onclick=()=>fin(true); $("#st-no").onclick=()=>fin(false);
+    if($("#st-g")) document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{ S.account.gender=b.dataset.g; save(); go("stats",true,true); }); }
+  if($("#statsset")) $("#statsset").onclick=()=>{ cur.statsNext="profil"; go("stats"); };
+  if(view==="admin"){ const run=async()=>{ const k=$("#ak").value.trim().toUpperCase(); if(!k) return err("Bitte gib den Team-Schlüssel ein."); $("#akok").disabled=true; err("Wird geladen …");
+      const r=await adminFetch(k); $("#akok").disabled=false; if(!r) return err("Keine Verbindung. Bitte später erneut versuchen."); if(!r.ok) return err("Der Schlüssel stimmt nicht.");
+      try{ sessionStorage.setItem("calmius-admin",k); }catch(e){} cur.adminData=r; go("admin",true,true); };
+    if($("#akok")) { $("#akok").onclick=run; $("#ak").onkeydown=e=>{ if(e.key==="Enter") run(); }; }
+    if($("#adout")) $("#adout").onclick=()=>{ cur.adminData=null; try{ sessionStorage.removeItem("calmius-admin"); }catch(e){} go("admin",true,true); }; }
   if(view==="register") $("#reg").onclick=async()=>{
     const n=$("#r-name").value.trim(), age=ageOk($("#r-age").value), m=$("#r-mail").value.trim().toLowerCase(), p=$("#r-pw").value, p2=$("#r-pw2").value;
     if(!n) return err("Bitte gib einen Namen ein."); if(age==null) return err("Bitte gib dein Alter ein.");
+    if(!cur.regG) return err("Bitte wähle eine Angabe zum Geschlecht.");
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m)) return err("Bitte gib eine gültige E-Mail-Adresse ein.");
     if(p.length<6) return err("Das Passwort braucht mindestens 6 Zeichen."); if(p!==p2) return err("Die Passwörter stimmen nicht überein.");
-    const salt=randSalt(); S=fresh(); S.account={name:n,age,email:m,salt,hash:await hash(p,salt),triggers:[],ownTriggers:""}; S.loggedIn=true; await newRecovery(); save(); cur.sos=false; cur.trigFrom="how"; cur.codeNext="triggers"; HIST=[]; go("code",false,true); };
+    const salt=randSalt(); S=fresh(); S.account={name:n,age,email:m,gender:cur.regG,salt,hash:await hash(p,salt),triggers:[],ownTriggers:""}; S.loggedIn=true; await newRecovery(); save(); cur.sos=false; cur.trigFrom="how"; cur.codeNext=age>=16?"stats":"triggers"; cur.statsNext="triggers"; HIST=[]; go("code",false,true); };
   if(view==="triggers"){ document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{ const t=S.account.triggers=S.account.triggers||[], k=b.dataset.t, i=t.indexOf(k); i<0?t.push(k):t.splice(i,1); b.classList.toggle("on"); save(); });
     $("#trigok").onclick=()=>{ S.account.ownTriggers=$("#own").value; save(); go(cur.trigFrom); }; }
   if(view==="login"){ const doLogin=async()=>{ const m=$("#l-mail").value.trim().toLowerCase(), p=$("#l-pw").value, a=S.account;
       if(!a||m!==a.email||await hash(p,a.salt)!==a.hash) return err("E-Mail oder Passwort stimmt nicht.");
-      S.loggedIn=true; cur.sos=false; save(); go(S.onboarded?"start":"how"); };
+      S.loggedIn=true; cur.sos=false; save(); statsVisit(); go(S.onboarded?"start":"how"); };
     $("#li").onclick=doLogin; $("#l-pw").onkeydown=e=>{ if(e.key==="Enter") doLogin(); }; }
   if($("#install")) $("#install").onclick=doInstall;
   if($("#newacc")) $("#newacc").onclick=()=>{ if(S.account&&!S.account.test) return confirmBox("Neues Konto erstellen?","Auf diesem Handy gibt es schon ein Konto. Ein neues Konto löscht das alte mit allen Daten.","Ja, neu erstellen",()=>go("register")); go("register"); };
@@ -753,6 +799,7 @@ function bind(){
     document.querySelectorAll("[data-open]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); const k=b.dataset.open, i=cur.open.indexOf(k); i<0?cur.open.push(k):cur.open.splice(i,1); go("fuermich",true); });
     document.querySelectorAll("[data-more]").forEach(b=>b.onclick=()=>{ const k=b.dataset.more, i=cur.more.indexOf(k); i<0?cur.more.push(k):cur.more.splice(i,1); go("fuermich",true); });
     if($("#dl")) $("#dl").onclick=async()=>{ const fn=`Meine Skill-Liste ${S.account.name}.html`, html=printHTML();
+      if(window.CalmiusAndroid){ CalmiusAndroid.print(html,fn); return; }
       if(window.claude&&claude.use){ try{ const d=await claude.use("downloads"); if(!d) throw {code:"unavailable"}; await d.save({filename:fn,data:html}); toast("Gespeichert – Datei öffnen zum Drucken"); return; }
         catch(e){ if(e&&e.code==="declined") return; } }
       try{ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([html],{type:"text/html"})); a.download=fn; document.body.appendChild(a); a.click(); a.remove(); toast("Gespeichert – Datei öffnen zum Drucken"); }
@@ -790,7 +837,7 @@ function confirmBox(title,text,yes,fn){ const o=document.createElement("div"); o
 function wipe(){ try{localStorage.removeItem(KEY);}catch(e){} mem=null; S=load(); cur.v=null; cur.sos=false; toast("Alles gelöscht"); go("welcome"); }
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{ cur.sos=false; HIST=[]; go(b.dataset.v,false,true); });
 if("serviceWorker" in navigator&&location.protocol==="https:"&&!/claude\.ai|claudeusercontent/.test(location.host)){ try{ navigator.serviceWorker.register("sw.js").catch(()=>{}); }catch(e){} }
-go(S.account&&S.loggedIn?(S.onboarded?"start":"how"):"welcome");
+if(location.hash==="#team"){ go("admin"); } else if(S.account&&S.loggedIn&&S.onboarded&&!S.stats&&!S.account.test&&+S.account.age>=16){ cur.statsNext="start"; go("stats"); } else go(S.account&&S.loggedIn?(S.onboarded?"start":"how"):"welcome"); setTimeout(statsVisit,800);
 </script>
 </body>
 </html>

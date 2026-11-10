@@ -1,0 +1,9 @@
+plugins { id 'com.android.application' }
+android {
+  namespace 'de.calmius.app'
+  compileSdk 34
+  defaultConfig { applicationId 'de.calmius.app'; minSdk 24; targetSdk 34; versionCode Integer.parseInt(System.getenv('VCODE') ?: '1'); versionName '1.' + (System.getenv('VCODE') ?: '1') }
+  signingConfigs { rel { storeFile file(System.getenv('KS_FILE') ?: '../ks.jks'); storePassword System.getenv('KS_PASS') ?: ''; keyAlias 'calmius'; keyPassword System.getenv('KS_PASS') ?: '' } }
+  buildTypes { release { minifyEnabled false; signingConfig signingConfigs.rel } }
+  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}

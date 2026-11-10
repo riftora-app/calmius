@@ -5,10 +5,9 @@ Skills-App für Anspannung, Selbstverletzungsdruck und Suizidgedanken.
 **App öffnen:** https://riftora-app.github.io/calmius/
 
 ## Auf dem Android-Handy installieren
-1. Den Link oben in **Chrome** öffnen.
-2. Oben rechts auf **⋮** tippen.
-3. **„App installieren“** bzw. **„Zum Startbildschirm hinzufügen“** wählen.
-4. Calmius erscheint als eigenes App-Symbol und funktioniert auch offline.
+**Als App-Datei:** [Calmius.apk herunterladen](https://riftora-app.github.io/calmius/calmius.apk) → Datei öffnen → „Aus dieser Quelle zulassen“ → „Installieren“. Calmius bekommt ein eigenes Symbol.
+
+**Ohne Download:** Link in Chrome öffnen → ⋮ → „App installieren“.
 
 ## Datenschutz
 - Alle Eingaben bleiben ausschließlich auf dem Handy (Browser-Speicher). Kein Server, kein Tracking, keine Cookies, keine Weitergabe.
