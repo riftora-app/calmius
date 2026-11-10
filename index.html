@@ -203,7 +203,7 @@ async function doInstall(){
   const inFrame=/claude\.ai|claudeusercontent/.test(location.host), base=inFrame?"https://riftora-app.github.io/calmius/":"";
   infoBox("App herunterladen",`<a class="btn" href="${base}calmius.apk" download="Calmius.apk" id="apkdl">⬇️ Calmius-App herunterladen (Android)</a>
     <p><b>So geht's:</b></p><p>1. Download antippen und warten, bis er fertig ist.<br>2. Die Datei „Calmius.apk“ öffnen.<br>3. Wenn das Handy fragt: „Aus dieser Quelle zulassen“ einschalten, dann „Installieren“.</p>
-    <p class="muted">Calmius erscheint danach mit eigenem Symbol auf dem Startbildschirm und funktioniert ohne Internet. Deine Daten bleiben nur auf dem Handy.</p>
+    <p class="muted">Calmius erscheint danach mit eigenem Symbol auf dem Startbildschirm. Beim ersten Öffnen braucht die App einmal Internet, danach geht sie auch offline. Deine Daten bleiben nur auf dem Handy.</p>
     ${installEvt?`<button class="btn sec" id="pwainst">Ohne Download als Web-App installieren</button>`:""}`);
   const pb=document.getElementById("pwainst"); if(pb) pb.onclick=async()=>{ pb.closest(".overlay").remove(); installEvt.prompt(); try{ await installEvt.userChoice; }catch(e){} installEvt=null; }; }
 function infoBox(title,html){ const o=document.createElement("div"); o.className="overlay";
