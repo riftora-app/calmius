@@ -1,6 +1,6 @@
 # Calmius
 
-Skills-App für Anspannung, Selbstverletzungsdruck und Suizidgedanken – Testversion.
+Skills-App für Anspannung, Selbstverletzungsdruck und Suizidgedanken.
 
 **App öffnen:** https://riftora-app.github.io/calmius/
 
@@ -11,7 +11,13 @@ Skills-App für Anspannung, Selbstverletzungsdruck und Suizidgedanken – Testve
 4. Calmius erscheint als eigenes App-Symbol und funktioniert auch offline.
 
 ## Datenschutz
-Alle Eingaben bleiben ausschließlich auf dem Handy (Browser-Speicher). Es gibt keinen Server, kein Tracking und keine Weitergabe.
+- Alle Eingaben bleiben ausschließlich auf dem Handy (Browser-Speicher). Kein Server, kein Tracking, keine Cookies, keine Weitergabe.
+- Passwort und Wiederherstellungscode werden nur als Hash gespeichert.
+- Die App-Dateien werden über GitHub Pages ausgeliefert; GitHub verarbeitet dabei technisch bedingt IP-Adressen. App-Eingaben werden nie übertragen.
+- Ausführliche Hinweise: in der App unter „Datenschutz & Hinweise“.
+
+## Passwort vergessen
+Beim Erstellen des Kontos zeigt die App einmalig einen Wiederherstellungscode. Damit lässt sich ein neues Passwort setzen – ohne Server und ohne dass jemand anderes das Passwort sieht.
 
 ## Hinweis
-Testversion. Ersetzt keine Behandlung und keine Hilfe durch Menschen. Wenn es zu viel wird: Pflege ansprechen.
+Sammlung von Selbsthilfe-Übungen. Stellt keine Diagnose, ersetzt keine Behandlung und ist kein Medizinprodukt. Im Notfall: 112.

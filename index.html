@@ -77,6 +77,11 @@ nav svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8}
 .overlay .card{max-width:420px;width:100%}
 .toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:10px 18px;border-radius:12px;font-size:16px;z-index:20}
 .foot{color:var(--muted);font-size:14px;text-align:center;margin-top:22px}
+.duo{display:flex;gap:10px;margin-top:22px}.duo .btn{flex:1;margin:0;font-size:15px;padding:12px 8px}
+.btn.install{background:transparent;color:var(--accent);border:2px solid var(--accent)}
+.link.small{font-size:14px;margin-top:6px}
+.codebox{font:700 28px/1.3 ui-monospace,Menlo,Consolas,monospace;letter-spacing:2px;text-align:center;background:var(--card2);border:2px dashed var(--accent);border-radius:14px;padding:18px 10px;margin:16px 0;user-select:all}
+.check{display:flex;gap:10px;align-items:center;font-size:16px;margin:14px 0}.check input{width:22px;height:22px;margin:0}
 .logo{font-size:44px;margin:30px 0 8px}
 ol.how{padding-left:22px} ol.how li{margin:10px 0}
 .hero{display:block;width:100%;text-align:left;border-radius:22px;padding:22px;margin:16px 0;background:linear-gradient(135deg,rgba(159,140,245,.35),rgba(111,208,201,.22));border:1px solid rgba(159,140,245,.45);box-shadow:0 10px 30px rgba(0,0,0,.25)}
@@ -169,6 +174,26 @@ let S=load();
 async function hash(pw,salt){ const txt=salt+":"+pw;
   try{ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(txt)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
   catch(e){ let h=5381; for(const c of txt) h=((h<<5)+h+c.charCodeAt(0))|0; return "f"+(h>>>0).toString(16); } }
+function rnd(n){ const a=new Uint8Array(n); try{ crypto.getRandomValues(a); }catch(e){ for(let i=0;i<n;i++) a[i]=Math.random()*256|0; } return a; }
+function randSalt(){ return [...rnd(16)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+const CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function normCode(s){ return (s||"").toUpperCase().replace(/[^A-Z0-9]/g,""); }
+async function newRecovery(){ let c=""; for(const b of rnd(12)) c+=CODE_ABC[b%32]; const a=S.account; a.rsalt=randSalt(); a.rhash=await hash(c,a.rsalt); cur.newCode=c.match(/.{4}/g).join("-"); }
+/* ===== Installieren (PWA) ===== */
+let installEvt=null;
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEvt=e; });
+window.addEventListener("appinstalled",()=>{ installEvt=null; if($("#install")) $("#install").remove(); toast("Calmius ist installiert"); });
+function isStandalone(){ try{ return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true; }catch(e){ return false; } }
+async function doInstall(){
+  if(installEvt){ installEvt.prompt(); try{ await installEvt.userChoice; }catch(e){} installEvt=null; return; }
+  const inFrame=/claude\.ai|claudeusercontent/.test(location.host);
+  infoBox("App installieren", inFrame?`<p>Öffne Calmius dafür direkt im Browser:</p><p><b>riftora-app.github.io/calmius</b></p>`:
+   `<p><b>Chrome (Android):</b> oben rechts auf ⋮ tippen, dann „App installieren“ oder „Zum Startbildschirm hinzufügen“.</p>
+    <p><b>Samsung Internet:</b> unten auf ≡ tippen, dann „Seite hinzufügen zu“ und „Startbildschirm“.</p>
+    <p><b>iPhone (Safari):</b> auf Teilen tippen, dann „Zum Home-Bildschirm“.</p>`); }
+function infoBox(title,html){ const o=document.createElement("div"); o.className="overlay";
+  o.innerHTML=`<div class="card" role="dialog" aria-modal="true"><h2 style="margin-top:0">${title}</h2>${html}<button class="btn" id="ibok">Verstanden</button></div>`;
+  document.body.appendChild(o); o.querySelector("#ibok").onclick=()=>o.remove(); }
 
 /* ===== Kategorien, Stufen, Wege, Auslöser ===== */
 const AREAS={
@@ -378,11 +403,34 @@ function demo(){ const pts=[], now=Date.now(), H=3600e3; let seed=7; const rnd=(
   return pts.filter(p=>p.t<=now).sort((a,b)=>b.t-a.t); }
 /* ===== Ansichten ===== */
 const V={
-  welcome(){ return `<img class="logoimg" src="icon-192.png" alt=""><div class="brand">Calmius</div><p>Deine Skills für Anspannung, Druck und einen stabilen Alltag – immer dabei.</p>
-      ${S.account&&!S.account.test?`<button class="btn" data-go="login">Anmelden</button>`:`<button class="btn" data-go="register">Konto erstellen</button>`}
-      <button class="btn sec" id="test">Testversion ohne Konto (für das Team)</button>
+  welcome(){ const has=S.account&&!S.account.test; return `<img class="logoimg" src="icon-192.png" alt=""><div class="brand">Calmius</div><p>Deine Skills für Anspannung, Druck und einen stabilen Alltag – immer dabei.</p>
+      ${isStandalone()?"":`<button class="btn install" id="install">📲 App installieren</button>`}
+      ${has?`<button class="btn" data-go="login">Anmelden</button>`:""}
       <button class="btn red" id="sos">Sofort-Hilfe ohne Anmeldung</button>
-      <p class="foot">Konto und Daten bleiben nur auf diesem Handy.</p>`; },
+      <div class="duo"><button class="btn sec" id="newacc">Konto erstellen</button><button class="btn sec" data-go="reset">Passwort vergessen</button></div>
+      <p class="foot">Konto und Daten bleiben nur auf diesem Handy.<br><button class="link small" data-go="datenschutz">Datenschutz & Hinweise</button></p>`; },
+  code(){ return `<h1>Dein Wiederherstellungscode</h1><p>Mit diesem Code kannst du ein neues Passwort setzen, wenn du deins vergisst.</p>
+      <div class="codebox" id="codebox">${esc(cur.newCode||"")}</div>
+      <p class="muted">Schreib ihn auf Papier und bewahre ihn sicher auf. Er wird nur dieses eine Mal angezeigt. Niemand sonst kennt ihn – auch das Team nicht.</p>
+      <label class="check"><input type="checkbox" id="codeok"> Ich habe den Code aufgeschrieben.</label>
+      <button class="btn" id="codedone" disabled>Weiter</button>`; },
+  reset(){ const a=S.account&&!S.account.test?S.account:null;
+    if(!a) return `<h1>Passwort vergessen</h1><p>Auf diesem Handy gibt es noch kein Konto.</p><button class="btn" id="newacc">Konto erstellen</button>`;
+    if(!a.rhash) return `<h1>Passwort vergessen</h1><p>Für dieses Konto gibt es noch keinen Wiederherstellungscode. Das Passwort lässt sich deshalb nicht zurücksetzen.</p><p class="muted">Du kannst Konto und Daten löschen und neu starten.</p><button class="btn red" id="resetwipe">Konto löschen und neu starten</button>`;
+    return `<h1>Passwort vergessen</h1><p>Gib deinen Wiederherstellungscode ein. Du hast ihn beim Erstellen des Kontos aufgeschrieben.</p>
+      <p class="muted">Das Team kann dir dabei helfen. Es sieht dein Passwort nie.</p>
+      <label for="rc">Wiederherstellungscode</label><input id="rc" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX">
+      <label for="np">Neues Passwort (mind. 6 Zeichen)</label><input id="np" type="password" autocomplete="new-password">
+      <label for="np2">Neues Passwort wiederholen</label><input id="np2" type="password" autocomplete="new-password">
+      <p class="err" id="err"></p><button class="btn" id="rcok">Neues Passwort speichern</button>
+      <button class="link" id="resetwipe2">Code verloren? Konto löschen und neu starten</button>`; },
+  datenschutz(){ return `<h1>Datenschutz & Hinweise</h1>
+      <div class="card"><h2 style="margin-top:0">Kurz gesagt</h2><p>Alles, was du in Calmius eingibst, bleibt nur auf diesem Handy. Es gibt keinen Server, kein Tracking, keine Cookies, keine Werbung und keine Analyse. Niemand außer dir kann deine Einträge sehen – auch nicht die Klinik oder wer die App bereitstellt.</p></div>
+      <div class="card"><h2 style="margin-top:0">Was gespeichert wird</h2><p>Name oder Spitzname, Alter, E-Mail (nur als Anmeldename), deine Werte, Auslöser, genutzte Skills und dein Notfallplan. Passwort und Wiederherstellungscode werden nur als Prüfwert (Hash) gespeichert, nie im Klartext.</p><p>Gespeichert wird im Browser-Speicher dieses Handys. Dieser Speicher und der Offline-Speicher der App sind technisch nötig, damit die App funktioniert, die du nutzen möchtest (§ 25 Abs. 2 Nr. 2 TDDDG). Eine Einwilligung per Cookie-Banner ist dafür nicht nötig.</p></div>
+      <div class="card"><h2 style="margin-top:0">Bereitstellung der App</h2><p>Die App-Dateien werden über GitHub Pages (GitHub, Inc., USA) geladen. Dabei verarbeitet GitHub technisch bedingt deine IP-Adresse und Browserdaten, um die Seite auszuliefern und abzusichern. Deine Einträge in der App werden dabei nie übertragen. Mehr dazu: <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">Datenschutzerklärung von GitHub</a>.</p></div>
+      <div class="card"><h2 style="margin-top:0">Deine Kontrolle</h2><p>Du kannst jederzeit alles löschen: im Profil unter „Konto und alle Daten löschen“, durch Löschen der Browserdaten oder durch Deinstallieren der App. Danach ist nichts mehr gespeichert.</p><p>Schütze dein Handy mit einer Bildschirmsperre. Wer dein entsperrtes Handy benutzt, könnte sonst auf den Browser-Speicher zugreifen.</p></div>
+      <div class="card"><h2 style="margin-top:0">Wofür Calmius gedacht ist</h2><p>Calmius ist eine Sammlung von Selbsthilfe-Übungen (Skills) für den Alltag. Die App stellt keine Diagnose, ersetzt keine Behandlung und ist kein Medizinprodukt. Wenn es dir sehr schlecht geht, sprich mit deinem Behandlungsteam. Im Notfall: 112.</p></div>
+      <p class="foot">Stand: November 2026</p>`; },
   register(){ return `<h1>Konto erstellen</h1><p class="muted">Dein Konto wird nur auf diesem Handy gespeichert – kein Server, keine Weitergabe.</p>
       <label for="r-name">Vorname oder Spitzname</label><input id="r-name" maxlength="30" autocomplete="nickname">
       <label for="r-age">Alter</label><input id="r-age" type="number" inputmode="numeric" min="12" max="110" placeholder="z. B. 34">
@@ -398,7 +446,7 @@ const V={
   login(){ return `<h1>Anmelden</h1>
       <label for="l-mail">E-Mail</label><input id="l-mail" type="email" autocomplete="email" value="${esc(S.account?S.account.email:"")}">
       <label for="l-pw">Passwort</label><input id="l-pw" type="password" autocomplete="current-password">
-      <p class="err" id="err"></p><button class="btn" id="li">Anmelden</button><button class="link" id="forgot">Passwort vergessen?</button>
+      <p class="err" id="err"></p><button class="btn" id="li">Anmelden</button><button class="link" data-go="reset">Passwort vergessen?</button>
       <button class="btn red" id="sos">Sofort-Hilfe ohne Anmeldung</button>`; },
   sosAge(){ return `<h1>Sofort-Hilfe</h1><label for="sa">Wie alt bist du?</label>
       <input id="sa" type="number" inputmode="numeric" min="12" max="110" placeholder="Alter">
@@ -504,7 +552,7 @@ const V={
         <p class="muted">Füg den Link deiner Playlist ein (in Spotify: Playlist › Teilen › Link kopieren).</p>
         <input id="sp" type="url" placeholder="https://open.spotify.com/playlist/…" value="${esc(S.spotify)}"><p class="err" id="sperr"></p>
         <button class="btn spot" id="spsave">Playlist verbinden</button>${S.spotify?`<a class="btn sec" href="${esc(S.spotify)}" target="_blank" rel="noopener">Playlist testen</a>`:""}</div>
-      <div class="card"><h2 style="margin-top:0">Datenschutz</h2><p>Alles bleibt nur auf diesem Handy. Das Passwort wird nur verschlüsselt (als Hash) gespeichert. Nichts geht an die Klinik oder ins Internet.</p></div>
+      <div class="card"><h2 style="margin-top:0">Datenschutz</h2><p>Alles bleibt nur auf diesem Handy. Passwort und Wiederherstellungscode werden nur als Hash gespeichert.</p><button class="btn sec" data-go="datenschutz">Datenschutz & Hinweise</button>${a.test?"":`<button class="btn sec" id="newcode">${a.rhash?"Neuen Wiederherstellungscode erstellen":"Wiederherstellungscode erstellen"}</button>`}</div>
       <button class="btn sec" id="intro">Einführung noch einmal ansehen</button>
       ${a.test?`<button class="btn red" id="endtest">Testversion beenden und Daten löschen</button>`:`<button class="btn sec" id="logout">Abmelden</button><button class="btn red" id="wipe">Konto und alle Daten löschen</button>`}
       <p class="foot">Calmius · Testversion 1.0</p>`; }
@@ -634,7 +682,7 @@ function exportText(r){ const ps=inRange(r), st=stats(ps), L=[], m=(v,t)=>v==nul
 
 /* ===== Steuerung ===== */
 let view="start", skillFrom="start";
-const OUT=["welcome","register","login","sosAge","sos","how"];
+const OUT=["welcome","register","login","sosAge","sos","how","code","reset","datenschutz"];
 const NAVMAP={start:"start",check:"start",rate:"start",hilfe:"start",eval:"start",rate2:"start",ergebnis:"start",skills:"skills",fuermich:"fuermich",plan:"plan",profil:"profil",triggers:"profil"};
 let HIST=[];
 const ROOTS=["start","skills","fuermich","plan","profil","welcome"];
@@ -662,14 +710,27 @@ function bind(){
     if(!n) return err("Bitte gib einen Namen ein."); if(age==null) return err("Bitte gib dein Alter ein.");
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m)) return err("Bitte gib eine gültige E-Mail-Adresse ein.");
     if(p.length<6) return err("Das Passwort braucht mindestens 6 Zeichen."); if(p!==p2) return err("Die Passwörter stimmen nicht überein.");
-    const salt=Math.random().toString(36).slice(2); S=fresh(); S.account={name:n,age,email:m,salt,hash:await hash(p,salt),triggers:[],ownTriggers:""}; S.loggedIn=true; save(); cur.sos=false; cur.trigFrom="how"; go("triggers"); };
+    const salt=randSalt(); S=fresh(); S.account={name:n,age,email:m,salt,hash:await hash(p,salt),triggers:[],ownTriggers:""}; S.loggedIn=true; await newRecovery(); save(); cur.sos=false; cur.trigFrom="how"; cur.codeNext="triggers"; HIST=[]; go("code",false,true); };
   if(view==="triggers"){ document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{ const t=S.account.triggers=S.account.triggers||[], k=b.dataset.t, i=t.indexOf(k); i<0?t.push(k):t.splice(i,1); b.classList.toggle("on"); save(); });
     $("#trigok").onclick=()=>{ S.account.ownTriggers=$("#own").value; save(); go(cur.trigFrom); }; }
   if(view==="login"){ const doLogin=async()=>{ const m=$("#l-mail").value.trim().toLowerCase(), p=$("#l-pw").value, a=S.account;
       if(!a||m!==a.email||await hash(p,a.salt)!==a.hash) return err("E-Mail oder Passwort stimmt nicht.");
       S.loggedIn=true; cur.sos=false; save(); go(S.onboarded?"start":"how"); };
-    $("#li").onclick=doLogin; $("#l-pw").onkeydown=e=>{ if(e.key==="Enter") doLogin(); };
-    $("#forgot").onclick=()=>confirmBox("Passwort vergessen?","Dein Konto liegt nur auf diesem Handy, deshalb kann das Passwort nicht zurückgesetzt werden. Du kannst Konto und Daten löschen und neu starten.","Konto löschen und neu starten",wipe); }
+    $("#li").onclick=doLogin; $("#l-pw").onkeydown=e=>{ if(e.key==="Enter") doLogin(); }; }
+  if($("#install")) $("#install").onclick=doInstall;
+  if($("#newacc")) $("#newacc").onclick=()=>{ if(S.account&&!S.account.test) return confirmBox("Neues Konto erstellen?","Auf diesem Handy gibt es schon ein Konto. Ein neues Konto löscht das alte mit allen Daten.","Ja, neu erstellen",()=>go("register")); go("register"); };
+  const askWipe=()=>confirmBox("Wirklich alles löschen?","Konto, Notfallplan und Protokoll sind danach weg.","Ja, alles löschen",wipe);
+  if($("#resetwipe")) $("#resetwipe").onclick=askWipe; if($("#resetwipe2")) $("#resetwipe2").onclick=askWipe;
+  if(view==="code"){ $("#codeok").onchange=e=>{ $("#codedone").disabled=!e.target.checked; }; $("#codedone").onclick=()=>{ cur.newCode=null; const n=cur.codeNext||"start"; cur.codeNext=null; HIST=[]; go(n,false,true); }; }
+  if(view==="reset"&&$("#rcok")){ const doReset=async()=>{ const a=S.account, rl=S.rl||{n:0,until:0};
+      if(Date.now()<rl.until) return err(`Zu viele Versuche. Bitte warte ${Math.ceil((rl.until-Date.now())/1000)} Sekunden.`);
+      const c=normCode($("#rc").value), p=$("#np").value, p2=$("#np2").value;
+      if(c.length!==12) return err("Der Code hat 12 Zeichen."); if(p.length<6) return err("Das Passwort braucht mindestens 6 Zeichen."); if(p!==p2) return err("Die Passwörter stimmen nicht überein.");
+      if(await hash(c,a.rsalt)!==a.rhash){ rl.n++; if(rl.n>=5){ rl.until=Date.now()+60000; rl.n=0; } S.rl=rl; save(); return err("Der Code stimmt nicht."); }
+      S.rl=null; a.salt=randSalt(); a.hash=await hash(p,a.salt); S.loggedIn=true; cur.sos=false; await newRecovery(); save(); toast("Neues Passwort gespeichert");
+      cur.codeNext=S.onboarded?"start":"how"; HIST=[]; go("code",false,true); };
+    $("#rcok").onclick=doReset; $("#np2").onkeydown=e=>{ if(e.key==="Enter") doReset(); }; }
+  if($("#newcode")) $("#newcode").onclick=()=>confirmBox("Neuen Code erstellen?","Der alte Wiederherstellungscode gilt danach nicht mehr.","Ja, neuen Code",async()=>{ await newRecovery(); save(); cur.codeNext="profil"; HIST=[]; go("code",false,true); });
   if(view==="how") $("#howdone").onclick=()=>{ S.onboarded=true; save(); go("start"); };
   if(view==="start") document.querySelectorAll(".area").forEach(b=>b.onclick=()=>{ cur.openCat=[b.dataset.area]; cur.openTier=[b.dataset.area+"hoch"]; cur.q=""; go("skills"); });
   if(view==="check"){ cur.lastCheck=null; } if(view==="check") document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{ cur.focus=b.dataset.mode; cur.a=cur.sv=cur.sui=null; cur.prob=[]; cur.trig=null; go("rate"); });
