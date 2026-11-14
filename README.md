@@ -1,6 +1,6 @@
 # Calmius
 
-Ein Projekt von **NoxRift™**. © 2026 NoxRift™ – Alle Rechte vorbehalten (siehe LICENSE).
+Ein Produkt von **Riftora**. © 2026 Riftora – Alle Rechte vorbehalten (siehe LICENSE).
 
 Skills-App für Anspannung, Selbstverletzungsdruck und Suizidgedanken.
 
