@@ -1,5 +1,7 @@
 # Calmius
 
+Ein Projekt von **NoxRift™**. © 2026 NoxRift™ – Alle Rechte vorbehalten (siehe LICENSE).
+
 Skills-App für Anspannung, Selbstverletzungsdruck und Suizidgedanken.
 
 **App öffnen:** https://riftora-app.github.io/calmius/
